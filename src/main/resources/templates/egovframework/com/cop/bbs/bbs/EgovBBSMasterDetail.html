@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:with="pageTitle=#{comCopBbs.boardMasterVO.title}">
+    <meta charset="UTF-8">
+    <title th:text="${pageTitle} + ' ' + #{title.detail}"></title>
+    <link th:href="@{/css/pattern_css.css}" type="text/css" rel="stylesheet">
+    <script src="/js/jquery-3.7.1.min.js"></script>
+</head>
+<body th:with="pageTitle=#{comCopBbs.boardMasterVO.title}">
+<!-- javascript warning tag  -->
+<noscript class="noScriptTitle" th:text="#{common.noScriptTitle.msg}"></noscript>
+<div class="conts-wrap scroll-check">
+    <div class="conts-wrap section-link" id="section_01">
+        <h3 class="sec-tit" th:text="${pageTitle} + ' ' + #{title.detail}"></h3>
+        <!-- table list -->
+        <div class="tbl-wrap" th:title="${#messages.msg('common.summary.inqire', pageTitle)}">
+            <dl class="tbl def-list">
+                <dt th:text="#{comCopBbs.boardMasterVO.detail.bbsNm}"></dt>
+                <dd id="bbsNm"></dd>
+                <dt th:text="#{comCopBbs.boardMasterVO.detail.bbsTyCode}"></dt>
+                <dd id="bbsTyCode"></dd>
+                <dt th:text="#{table.reger}"></dt>
+                <dd id="frstRegisterNm"></dd>
+                <dt th:text="#{table.regdate}"></dt>
+                <dd id="frstRegistPnttm"></dd>
+                <dt th:text="#{comCopBbs.boardMasterVO.detail.useAt}"></dt>
+                <dd id="useAt"></dd>
+                <dt th:text="#{comCopBbs.boardMasterVO.detail.replyPosblAt}"></dt>
+                <dd id="replyPosblAt"></dd>
+                <dt th:text="#{comCopBbs.boardMasterVO.detail.fileAtchPosblAt}"></dt>
+                <dd id="fileAtchPosblAt"></dd>
+                <dt th:text="#{comCopBbs.boardMasterVO.detail.atchPosblFileNumber}"></dt>
+                <dd id="atchPosblFileNumber"></dd>
+                <dt th:text="#{comCopBbs.boardMasterVO.detail.bbsIntrcn}"></dt>
+                <dd id="bbsIntrcn"></dd>
+                <dt th:text="#{comCopBbs.boardMasterVO.detail.bbsAdres}"></dt>
+                <dd id="bbsAdres"></dd>
+                <dt th:text="#{comCopBbs.boardMasterVO.detail.option}"></dt>
+                <dd id="option"></dd>
+            </dl>
+        </div>
+        <!-- //table list -->
+        <div class="page-btn-wrap both">
+            <button type="button" class="btn xlg tertiary" onclick="fn_egov_inqire_bbslist()" th:text="#{button.list}" th:title="#{title.list} + ' ' + #{input.button}"></button>
+
+            <div class="btn-wrap">
+                <button type="button" class="btn xlg" id="updateBtn" onclick="fn_egov_updt_view_bbs()" th:text="#{button.update}" th:title="#{title.update} + ' ' + #{input.button}"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    var bbsId = /*[[${bbsId}]]*/;
+
+    $(document).ready(function() {
+        /*********************************************************
+         * 페이지 로드 시 초기 데이터 가져오기
+         ******************************************************** */
+        fn_egov_inquire_bbsdetail(bbsId);
+    });
+
+    /*********************************************************
+     * 조회 처리 함수
+     ******************************************************** */
+    function fn_egov_inquire_bbsdetail(bbsId) {
+        $.ajax({
+            url: '/cop/bbs/bbs/selectBBSMasterDetail',
+            method: 'GET',
+            data: { bbsId: bbsId },
+            success: function (response) {
+                renderBbsDetail(response);
+            },
+            error: function (error) {
+                console.error("Error fetching bbs detail:", error);
+            }
+        });
+    }
+
+    /*********************************************************
+     * 게시글 렌더링 함수
+     ******************************************************** */
+    function renderBbsDetail(response) {
+        $('#bbsNm').text(response.bbsNm);
+        $('#bbsTyCode').text(response.bbsTyCodeNm);
+        $('#frstRegisterNm').text(response.frstRegisterNm);
+        $('#frstRegistPnttm').text(response.frstRegistPnttm);
+        $('#useAt').text(response.useAt);
+        $('#replyPosblAt').text(response.replyPosblAt);
+        $('#fileAtchPosblAt').text(response.fileAtchPosblAt);
+        $('#atchPosblFileNumber').text(response.atchPosblFileNumber);
+        $('#bbsIntrcn').text(response.bbsIntrcn);
+        // 링크를 동적으로 생성하여 설정
+        const bbsAdres = '/cop/bbs/bbs/selectArticleListView?bbsId=' + response.bbsId;
+        const bbsAdresLink = '<a href="' + bbsAdres + '">' + bbsAdres + '</a>';
+        $('#bbsAdres').html(bbsAdresLink);
+        // 옵션 값 설정
+        var option = '';
+        if (response.option == 'comment') {
+            option = /*[[#{comCopBbs.boardMasterVO.detail.option2}]]*/;
+        } else if (response.option == 'stsfdg') {
+            option = /*[[#{comCopBbs.boardMasterVO.detail.option3}]]*/;
+        } else {
+            option = /*[[#{comCopBbs.boardMasterVO.detail.option1}]]*/;
+        }
+        $('#option').text(option);
+    }
+
+    /*********************************************************
+     * 목록 버튼 처리 함수
+     ******************************************************** */
+    function fn_egov_inqire_bbslist() {
+        // 현재 URL에서 pageNum 파라미터 추출
+        var urlParams = new URLSearchParams(window.location.search);
+        var pageNum = urlParams.get('pageNum') || 1; // pageNum이 없으면 기본값으로 1 설정
+
+        // 목록 화면 URL로 이동, pageNum을 쿼리 파라미터로 포함
+        window.location.href = '/cop/bbs/bbs/selectBBSMasterInfsView?pageNum=' + pageNum;
+    }
+
+    /*********************************************************
+     * 수정 버튼 처리 함수
+     ******************************************************** */
+    function fn_egov_updt_view_bbs() {
+        // 현재 URL에서 pageNum 파라미터 추출
+        var urlParams = new URLSearchParams(window.location.search);
+        var pageNum = urlParams.get('pageNum') || 1; // pageNum이 없으면 기본값으로 1 설정
+
+        // 목록 화면 URL로 이동, pageNum을 쿼리 파라미터로 포함
+        window.location.href = '/cop/bbs/bbs/updateBBSMasterView?bbsId=' + bbsId + '&pageNum=' + pageNum;
+    }
+</script>
+
+</body>
+</html>

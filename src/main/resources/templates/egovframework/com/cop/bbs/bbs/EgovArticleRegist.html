@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:with="pageTitle=#{comCopBbs.articleVO.title}">
+    <meta charset="UTF-8">
+    <title th:text="${pageTitle} + ' ' + #{title.create}"></title>
+    <link th:href="@{/css/pattern_css.css}" type="text/css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/ckeditor5_simple/ckeditor5.css}">
+    <link rel="stylesheet" th:href="@{/css/ckEditor_simple-main.css}">
+    <style>
+        .form-checks-inline{
+            gap: 2.5rem;
+        }
+        .form-checks-inline .form-wrap{
+            justify-items: center;
+            gap: var(--krds-spacer-2);
+        }
+        .textarea-wrap .ck-content{
+            height:300px;
+        }
+    </style>
+    <script src="/js/jquery-3.7.1.min.js"></script>
+</head>
+<body th:with="pageTitle=#{comCopBbs.articleVO.title}">
+<!-- javascript warning tag  -->
+<noscript class="noScriptTitle" th:text="#{common.noScriptTitle.msg}"></noscript>
+    <div>
+        <h1 th:text="${pageTitle} + ' ' + #{title.create}"></h1><!--게시글 등록-->
+        <!-- 게시글 등록 입력폼 -->
+        <div class="txt-box bg-white" th:title="#{common.summary.regist(${pageTitle})}">
+            <div class="box-cnt">
+                <div class="box-sec">
+                    <div class="form-group"><!--글 제목-->
+                        <div class="form-tit" th:text="#{comCopBbs.articleVO.regist.nttSj}"></div>
+                        <div class="form-conts">
+                            <input type="text" name="nttSj" id="nttSj" class="form-control" placeholder="입력하세요" th:title="#{comCopBbs.articleVO.regist.nttSj} + ' ' + #{input.input}">
+                            <span id="nttSjError" style="color:red"></span>
+                        </div>
+                    </div>
+                    <div class="form-group"><!--제목 Bold 여부-->
+                        <div class="form-check sm">
+                            <input type="checkbox" name="sjBoldAt" id="sjBoldAt" class="form-control" th:title="#{comCopBbs.articleVO.regist.sjBoldAt}">
+                            <label for="sjBoldAt" th:text="#{comCopBbs.articleVO.regist.sjBoldAt}"></label>
+                        </div>
+                    </div>
+                    <div class="form-group"><!--글 내용-->
+                        <div class="form-tit" th:text="#{comCopBbs.articleVO.regist.nttCn}"></div>
+                        <div class="form-group full">
+                            <div class="form-conts">
+                                <div class="textarea-wrap">
+                                    <div id="editor"></div>
+                                </div>
+                                <span id="nttCnError" style="color:red"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <!--유효기간 설정-->
+                    <div class="form-group">
+<!--                        <div class="form-tit" th:text="#{comCopBbs.articleVO.regist.ntceDe}"></div>-->
+                        <div class="form-conts datepicker-conts" style="flex-direction: row; justify-content: space-between;">
+                            <div class="datepicker-input" style="width: 45%">
+<!--                                <label for="startDate">시작 날짜</label>-->
+                                <input type="date" class="form-control datepicker cal" name="ntceBgnde" id="startDate" style="padding-right:1rem">
+                                <span id="ntceBgndeError" style="color:red"></span>
+                            </div>
+                            <span style="margin:auto 0;"> ~ </span>
+                            <div class="datepicker-input" style="width: 45%">
+<!--                                <label for="endDate">종료 날짜</label>-->
+                                <input type="date" class="form-control datepicker cal" name="ntceEndde" id="endDate" style="padding-right:1rem">
+                                <span id="ntceEnddeError" style="color:red"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <!--첨부파일-->
+                    <div class="form-group" id="fileAtchFrm">
+                        <div class="form-tit" th:text="#{comCopBbs.articleVO.regist.atchFile}"></div>
+                        <div class="file-upload" style="padding: var(--krds-spacer-10); gap: var(--krds-spacer-5);">
+                            <input type="file" name="atchFile" id="fileUpload" class="sr-only" multiple="multiple">
+                            <p class="txt">첨부할 파일을 여기에 끌어다 놓거나,</br> 파일 선택 버튼을 눌러 파일을 직접 선택해주세요.</p>
+                            <label for="fileUpload" class="btn primary ico-before ico-upload md" th:text="#{input.cSelect}"></label>
+                        </div>
+                        <div class="file-upload-result" style="display: none">
+                            <div class="upload-top"></div>
+                            <ul class="upload-list" id="upload-list"></ul>
+                        </div>
+                        <span id="atchFileError" style="color:red"></span>
+                    </div>
+                </div>
+            </div>
+            <!-- 체크박스 그룹 -->
+            <div class="form-checks-inline">
+                <div class="form-wrap"><!--공지신청 여부-->
+                    <div class="form-tit" th:text="#{comCopBbs.articleVO.regist.noticeAt}"></div>
+                    <div class="form-switch">
+                        <input type="checkbox" name="noticeAt" id="noticeAt" th:title="#{comCopBbs.articleVO.regist.noticeAt}">
+                        <i></i>
+                        <label for="noticeAt"></label>
+                    </div>
+                </div>
+                <div class="form-wrap"><!--비밀글 여부-->
+                    <div class="form-tit" th:text="#{comCopBbs.articleVO.regist.secretAt}"></div>
+                    <div class="form-switch">
+                        <input type="checkbox" name="secretAt" id="secretAt" th:title="#{comCopBbs.articleVO.regist.secretAt}">
+                        <i></i>
+                        <label for="secretAt"></label>
+                    </div>
+                </div>
+                <div class="form-wrap"><!--익명등록 여부-->
+                    <div class="form-tit" th:text="#{comCopBbs.articleVO.regist.anonymousAt}"></div>
+                    <div class="form-switch">
+                        <input type="checkbox" name="anonymousAt" id="anonymousAt" th:title="#{comCopBbs.articleVO.regist.anonymousAt}">
+                        <i></i>
+                        <label for="anonymousAt"></label>
+                    </div>
+                </div>
+            </div>
+            <!-- //게시판 등록 입력폼 -->
+        </div>
+        <div class="page-btn-wrap both">
+            <button type="button" class="btn xlg tertiary" onclick="window.history.back();" th:text="#{button.list}" th:title="#{button.list} + ' ' + #{input.button}"></button>
+
+            <div class="btn-wrap">
+<!--                <button type="button" class="btn xlg" onclick="fn_egov_regist_bbs()" th:text="#{button.create}" th:title="#{button.create} + ' ' + #{input.button}"></button>-->
+                <button type="button" class="btn xlg" id="insertBtn" th:text="#{button.create}" th:title="#{button.create} + ' ' + #{input.button}"></button>
+            </div>
+        </div>
+    </div>
+
+
+<script th:inline="javascript">
+    var bbsId = /*[[${boardVO.bbsId}]]*/;
+    var nttId = /*[[${boardVO.nttId}]]*/;
+    var parnt = /*[[${boardVO.parnts}]]*/;
+    var answerAt = /*[[${boardVO.replyAt}]]*/;
+    var frstRegistPnttm;
+    var answerLc = 0;
+    let editorData = "";
+    let rdCnt = 0;
+    let atchFileId = "";
+    let sortOrdr = 0;
+    let deleteFileSn = [];
+
+    /*********************************************************
+     * 게시판 상세 정보 및 게시판별 설정
+     ******************************************************** */
+    $.ajax({
+        url:"/cop/bbs/bbs/selectBBSMasterDetail",
+        method:"get",
+        data: { bbsId: bbsId },
+        success:function(result){
+            var html = "<div class='file-total'><span class='current'>0</span>"+"개 / "+"<span class='total-size'>"+result.atchPosblFileNumber+"</span>"+"개</div>"
+            $(".upload-top").append(html);
+            if(result.bbsTyCode === "BBST01"){          // 일반게시판
+
+            }else if(result.bbsTyCode === "BBST02"){    // 익명게시판
+
+            }else if(result.bbsTyCode === "BBST03"){    // 공지게시판
+
+            }else{                                      // 방명록
+                $("#fileAtchFrm").hide();
+            }
+        },
+        error:function(error){
+            console.log("###### ERROR ######")
+            console.log(error);
+        }
+    })
+
+    /* 비밀글일 경우 제목 진하게, 공지 등록, 익명 등록 사용 불가 */
+    $("#secretAt").change(function(){
+       if($('input:checkbox[id="secretAt"]').is(":checked") === true){
+           $("#anonymousAt").prop('disabled', true);
+           $("#noticeAt").prop('disabled', true);
+           $("#sjBoldAt").prop('disabled', true);
+       }else{
+           $("#anonymousAt").removeAttr("disabled");
+           $("#noticeAt").removeAttr("disabled");
+           $("#sjBoldAt").removeAttr("disabled");
+       }
+    });
+
+    /* 익명글인 경우 공지등록 사용 불가 */
+    $("#anonymousAt").change(function(){
+        if($('input:checkbox[id="anonymousAt"]').is(":checked") === true){
+            $("#noticeAt").prop('disabled', true);
+        }else{
+            $("#noticeAt").removeAttr("disabled");
+        }
+    });
+
+    /*********************************************************
+     * 파일 업로드
+     ******************************************************** */
+    function formatBytes(bytes, decimals = 2) {
+        if (bytes === 0) return '0 Bytes';
+
+        const k = 1024;
+        const dm = decimals < 0 ? 0 : decimals;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    }
+
+    const fileList = [];
+    $("#fileUpload").change(function(e){
+        if(fileList.length+1 > $(".total-size").text()){
+            alert("첨부파일 최대 갯수를 초과하였습니다.");
+        }else{
+            for(var i=0; i<(e.target.files).length; i++){
+                fileList.push(e.target.files[i]);
+            }
+            $(".file-upload-result").css("display","block");
+            fileAppend(fileList);
+        }
+    });
+    function fileAppend(fileList){
+        let html = "";
+        $("#upload-list").empty();
+        fileList.forEach(function(item,index){
+            var name;
+            var type;
+            var size;
+            var sn;
+            if(item instanceof File){
+                name= item.name;
+                type= item.type.split('/')[1];
+                size= item.size;
+            }else{
+                name= item.orignlFileNm;
+                type= item.fileExtsn;
+                size= item.fileSize;
+                sn= item.fileSn;
+            }
+
+            $(".current").text(fileList.length);
+            html += "<li id='file_"+index+"'><div class='in'>"
+                +"<div class='file-name'>"+name+" ["+type+", "+formatBytes(size)+"]</div>"
+                +"<div class='file-btn' onclick='fileDel("+index+","+sn+")'><button type='button' class='btn btn-txt ico-before ico-del sm h-auto''>삭제</button></div>"
+                +"</div></li>";
+        });
+        $("#upload-list").append(html);
+    }
+
+    function fileDel(arr,sn){
+        fileList.splice(arr,1);
+        $("#file_"+arr).remove();
+        $(".current").text(fileList.length);
+        fileAppend(fileList);
+        if(fileList.length === 0){
+            $(".file-upload-result").css("display","none");
+        }
+        if(sn != null){
+            console.log("삭제할 파일순서 > " + sn);
+            deleteFileSn.push(sn);
+        }
+    }
+
+    // 브라우저의 기본 드래그 앤 드롭 동작을 문서 전체에 걸쳐 방지
+    document.addEventListener('dragover', (event) => {
+        event.preventDefault();
+    });
+
+    document.addEventListener('drop', (event) => {
+        event.preventDefault();
+    });
+
+    // 업로드 영역에 파일 Drop 시 파일 추가
+    $(".file-upload").on("drop",function(e){
+        e.preventDefault();
+        e.stopPropagation();
+
+        if(fileList.length+1 > $(".total-size").text()){
+            alert("첨부파일 최대 갯수를 초과하였습니다.");
+        }else{
+            for(var i=0; i<(e.originalEvent.dataTransfer.files).length; i++){
+                fileList.push(e.originalEvent.dataTransfer.files[i]);
+            }
+            $(".file-upload-result").css("display","block");
+            fileAppend(fileList);
+        }
+    });
+
+    function fileAppendHtmlUpdate(fileList){
+        fileList.forEach(function(item,index){
+            var sn = item.fileSn;
+            html = "<li id='file_"+index+"'><div class='in'>"
+                +"<div class='file-name'>"+item.orignlFileNm+" ["+item.fileExtsn+", "+formatBytes(item.fileSize)+"]</div>"
+                +"<div class='file-btn' onclick='fileDel("+index+","+sn+")'><button type='button' class='btn btn-txt ico-before ico-del sm h-auto' id='fileDelete_"+index+"'>삭제</button></div>"
+                +"</div></li>";
+
+            $(".file-upload-result").css("display","block");
+            $(".current").text(fileList.length);
+            $("#upload-list").append(html);
+        })
+    }
+</script>
+
+<script type="module" th:src="@{/ckeditor5_simple/ckeditor5.js}"></script>
+<script type="module" th:src="@{/js/ckEditor_simple-main.js}"></script>
+<script th:inline="javascript" th:type="module">
+/*********************************************************
+ * Ckeditor5 Script 적용
+ ******************************************************** */
+
+import {editorConfig} from "../../../../../../../js/ckEditor_simple-main.js";
+import {ClassicEditor} from "../../../../../../ckeditor5_simple/ckeditor5.js";
+
+ClassicEditor.create(document.querySelector('#editor'), editorConfig)
+    .then(editor => {
+        if(nttId != 0 || parnt != 0){
+            console.log("부모글 > " + parnt);
+            console.log("게시글 > " + nttId);
+            if(parnt != 0){
+                nttId = parnt;
+            }
+            $.ajax({
+                url: '/cop/bbs/bbs/selectArticleDetail',
+                method: 'GET',
+                data: { bbsId: bbsId, nttId: nttId },
+                success: function(result){
+                    console.log(result);
+                    if(parnt == 0){
+                        console.log("수정");
+                        $("#nttSj").val(result.nttSj);
+                        editor.setData(result.nttCn);
+                        $("#startDate").val(result.ntceBgnde);
+                        $("#endDate").val(result.ntceEndde);
+                        if(result.noticeAt === "Y"){
+                            $("#noticeAt").prop('checked', true);
+                        }
+                        if(result.secretAt === "Y"){
+                            $("#secretAt").prop('checked', true);
+                        }
+                        if(result.sjBoldAt === "Y"){
+                            $("#sjBoldAt").prop('checked', true);
+                        }
+                        if(result.atchFileId != null){
+                            // 첨부파일이 있는 경우
+                            atchFileId=result.atchFileId;
+                            $.ajax({
+                                url:"/cmm/fms/selectFileInfs",
+                                method:"post",
+                                data:{"atchFileId":result.atchFileId},
+                                success:function(result){
+                                    console.log("#####첨부된 파일#####")
+                                    console.log(result);
+                                    result.forEach(function(item,index){
+                                        fileList.push(item);
+                                    });
+                                    fileAppendHtmlUpdate(fileList);
+                                }
+                            })
+                        }
+                    }
+
+                    if(parnt != 0){
+                        rdCnt = 0;
+                    }else{
+                        rdCnt = result.rdcnt;
+                    }
+                    sortOrdr = result.sortOrdr;
+                    frstRegistPnttm = result.frstRegistPnttm;
+                    answerAt = result.replyPosblAt;
+                    // parnt = parnts;
+                    answerLc = result.answerLc;
+                }
+            });
+
+        }
+        $("#insertBtn").click(function(){
+            editorData = editor.getData();
+
+            const sjBoldAtCheck = $("#sjBoldAt");
+            const noticeCheck = $("#noticeAt");
+            const secretCheck = $("#secretAt");
+            const anonymousCheck = $("#anonymousAt");
+
+            if($('input:checkbox[id="sjBoldAt"]').is(":checked") === true){
+                sjBoldAtCheck.val("Y")
+            }else{
+                sjBoldAtCheck.val("N")
+            }
+
+            if($('input:checkbox[id="noticeAt"]').is(":checked") === true){
+                noticeCheck.val("Y")
+            }else{
+                noticeCheck.val("N")
+            }
+
+            if($('input:checkbox[id="secretAt"]').is(":checked") === true){
+                secretCheck.val("Y");
+            }else{
+                secretCheck.val("N");
+            }
+
+            if($('input:checkbox[id="anonymousAt"]').is(":checked") === true){
+                anonymousCheck.val("Y");
+            }else{
+                anonymousCheck.val("N");
+            }
+
+            fn_egov_regist_bbs(editorData);
+        });
+    })
+    .catch(error => {
+        console.error(error);
+    });
+
+/*********************************************************
+ * 게시글 등록 처리 함수
+ ******************************************************** */
+function fn_egov_regist_bbs(editorData) {
+    const data = {
+        nttSj: $('#nttSj').val(),
+        sjBoldAt: $('input[name="sjBoldAt"]').val(),
+        nttCn : editorData,
+        noticeAt : $('input[name="noticeAt"]').val(),
+        secretAt : $('input[name="secretAt"]').val(),
+        anonymousAt : $('input[name="anonymousAt"]').val(),
+        ntceBgnde: $('input[name="ntceBgnde"]').val(),
+        ntceEndde: $('input[name="ntceEndde"]').val(),
+        bbsId: /*[[${bbsId}]]*/,
+        nttId: /*[[${nttId}]]*/,
+        nttNo: 1,
+        useAt:"Y",
+        inqireCo:rdCnt,
+        atchFileId: atchFileId,
+        sortOrdr:sortOrdr,
+        replyAt:answerAt,
+        parnts:parnt,
+        replyLc:answerLc
+    };
+    console.log(data);
+
+    // if(frstRegistPnttm != null){
+    //     data.frstRegistPnttm = frstRegistPnttm;
+    // }
+
+    const delData= {
+        atchFileId: atchFileId,
+        deleteFileSn: deleteFileSn
+    }
+
+    const formData = new FormData();
+    for (const key in data) {
+        formData.append(key, data[key]);
+    }
+
+    // Step 3: 파일 리스트를 FormData에 추가
+    if (fileList && fileList.length > 0) {
+        for (let i = 0; i < fileList.length; i++) {
+            formData.append("fileList", fileList[i]);
+        }
+    }
+
+    // 기존 저장되어있는 파일 삭제
+    if(deleteFileSn.length !== 0){
+        $.ajax({
+           url:"/cmm/fms/deleteFileInfs",
+            method:"post",
+            data: delData,
+            success:function(result){
+               console.log("삭제완료")
+            },
+            error:function (error){
+               console.log("에러 발생")
+                console.log(error);
+            }
+        });
+    }
+
+    // 서버로 데이터 전송
+    $.ajax({
+        url: '/cop/bbs/bbs/insertArticle', // 실제 서버 URL로 변경
+        type: 'post',
+        data: formData,
+        processData: false, // FormData 사용 시 필요
+        contentType: false, // FormData 사용 시 필요
+        success : function(response){
+            alert(response);
+            window.location.href = '/cop/bbs/bbs/selectBBSMasterInfsView';
+        },
+        error : function(error){
+            (error.responseJSON.errors).forEach(function(item){
+                $('#'+item.field+'Error').text(item.defaultMessage);
+            })
+        }
+    })
+};
+
+/*********************************************************
+ * 게시기간 Validation
+ ******************************************************** */
+const startDate = document.getElementById("startDate");
+const endDate = document.getElementById("endDate");
+
+startDate.addEventListener("change", function(){
+    if(startDate.value > endDate.value){    // 시작일이 종료일보다 늦는 경우
+        if(endDate.value !== ""){
+            alert([[#{comCopBbs.articleVO.ntceDeError}]]);
+            startDate.value = null;
+        }
+    }
+});
+endDate.addEventListener("change", function(){
+    if(endDate.value < startDate.value){
+        if(startDate.value !== ""){
+            alert([[#{comCopBbs.articleVO.ntceDeError}]]);
+            endDate.value = null;
+        }
+    }
+});
+
+function dateToString(date) {         // yyyy-mm-dd 패턴 변환
+    let dateFormat = date.getFullYear() +
+        '-' + ( (date.getMonth()+1) < 9 ? "0" + (date.getMonth()+1) : (date.getMonth()+1) )+
+        '-' + ( (date.getDate()) < 9 ? "0" + (date.getDate()) : (date.getDate()) );
+    return dateFormat;
+}
+
+var todayDate = new Date();
+var yesterDay = dateToString(new Date(todayDate.setDate(todayDate.getDate()-1)));
+
+startDate.setAttribute("min", yesterDay);
+// ======== Date Validation End
+</script>
+
+</body>
+</html>

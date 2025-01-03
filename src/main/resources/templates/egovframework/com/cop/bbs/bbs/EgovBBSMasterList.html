@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:with="pageTitle=#{comCopBbs.boardMasterVO.title}">
+    <meta charset="UTF-8">
+    <title th:text="${pageTitle} + ' ' + #{title.list}"></title><!--게시판 목록-->
+    <link th:href="@{/css/pattern_css.css}" type="text/css" rel="stylesheet">
+    <script src="/js/jquery-3.7.1.min.js"></script>
+</head>
+<body th:with="pageTitle=#{comCopBbs.boardMasterVO.title}">
+<!-- javascript warning tag  -->
+<noscript class="noScriptTitle" th:text="#{common.noScriptTitle.msg}"></noscript>
+    <div>
+        <h1 th:text="${pageTitle} + ' ' + #{title.list}"></h1><!--게시판 목록-->
+        <!--하단 버튼-->
+        <!-- 검색 입력폼 -->
+        <div class="search-top-box" th:title="#{common.searchCondition.msg}">
+            <div class="sch-form-wrap">
+                <select class="form-select" name="searchCnd" id="searchCnd" th:title="#{title.searchCondition} + ' ' + #{input.cSelect}">
+                    <option value="0" th:selected="${searchCnd == '0'}">
+                        <span th:text="#{comCopBbs.boardMasterVO.list.bbsNm}"></span>
+                    </option>
+                    <option value="1" th:selected="${searchCnd == '1'}">
+                        <span th:text="#{comCopBbs.boardMasterVO.list.bbsIntrcn}"></span>
+                    </option>
+                </select>
+                <div class="sch-input">
+                    <input type="text" class="form-control" placeholder="검색어를 입력해주세요" name="searchWrd" id="searchWrd" th:title="#{title.search} + ' ' + #{input.input}">
+                    <button type="button" class="btn btn-ico ico-sch" onclick="fn_egov_search_bbssj(1)" th:title="#{title.inquire} + ' ' + #{input.button}">
+                        <span class="sr-only" th:text="#{button.inquire}"></span>
+                    </button>
+                </div>
+                <button type="button" class="btn" onclick="window.location.href = '/cop/bbs/bbs/insertBBSMasterView';" th:text="#{button.create}" th:title="#{button.create} + ' ' + #{input.button}"></button>
+            </div>
+        </div>
+        <!-- //검색 입력폼 -->
+
+        <!-- 검색 결과 : 리스트 -->
+        <ul class="search-list type1" id="bbsList" th:title="#{common.summary.list(${pageTitle})}">
+            <!-- 기본적으로 빈 목록을 렌더링 -->
+        </ul>
+        <!-- //검색 결과 : 리스트 -->
+
+        <!-- paging : 웹 -->
+        <div class="pagination w-page" id="pagination">
+            <div class="page-links">
+                <a class="page-link active" href="#">1</a>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        var messages = {
+            "table.num": /*[[#{table.num}]]*/,
+            "table.reger": /*[[#{table.reger}]]*/,
+            "table.regdate": /*[[#{table.regdate}]]*/,
+            "comCopBbs.boardMasterVO.list.useAt": /*[[#{comCopBbs.boardMasterVO.list.useAt}]]*/,
+            "common.nodata.msg": /*[[#{common.nodata.msg}]]*/
+        };
+
+        // 페이지 로드 시 초기 데이터 가져오기
+        $(document).ready(function() {
+            var pageNum = /*[[${pageNum}]]*/; // 서버에서 전달된 pageNum 값을 사용
+            fn_egov_search_bbssj(pageNum);
+        });
+
+        /*********************************************************
+         * 조회 처리 함수
+         ******************************************************** */
+        function fn_egov_search_bbssj(pageIndex) {
+            const searchCnd = $('#searchCnd').val();
+            const searchWrd = $('#searchWrd').val();
+            $.ajax({
+                url: `/cop/bbs/bbs/selectBBSMasterInfs`,
+                method: 'GET',
+                data: { searchCnd: searchCnd, searchWrd: searchWrd, pageIndex: pageIndex },
+                success: function(response) {
+                    renderBbsList(response, pageIndex);
+                    renderPagination(response.paginationHtml);
+                    // 조회 후 값을 화면에 반영
+                    $('#searchCnd').val(searchCnd);
+                    $('#searchWrd').val(searchWrd);
+                },
+                error: function(error) {
+                    console.error("Error fetching bbs list:", error);
+                    renderBbsList({ content: [] }, pageIndex);
+                    renderPagination({ totalElements: 0, number: 0, size: 10, totalPages: 1 });
+                }
+            });
+        }
+
+        /*********************************************************
+         * 게시판 목록 렌더링 함수
+         ******************************************************** */
+        function renderBbsList(response, pageIndex) {
+            const bbsList = $('#bbsList');
+            bbsList.empty();
+            if (response.content.length > 0) {
+                const totalElements = response.totalElements;
+                response.content.forEach((bbs, index) => {
+                    const listItem = `<li class="li">
+                        <div class="in">
+                            <div class="card-top">
+                                <span title="${messages['table.num']}">${totalElements - ((response.number * response.size) + index)}</span>
+                                <div class="btn-area">
+                                    <button type="button" class="sm">${messages['table.reger']} : </button>
+                                    <button type="button" class="sm">${bbs.frstRegisterNm}</button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <a href="/cop/bbs/bbs/selectBBSMasterDetailView?bbsId=${bbs.bbsId}&pageNum=${pageIndex}" class="c-text">
+                                    <p class="c-tit"><span class="span">${bbs.bbsNm}</span></p>
+                                    <p class="c-date">
+                                        <strong class="key">${messages['table.regdate']}</strong>
+                                        <span class="value">${bbs.frstRegistPnttm}</span>
+                                    </p>
+                                </a>
+                            </div>
+                            <div class="card-btm">
+                                <span class="krds-badge" title="${messages['comCopBbs.boardMasterVO.list.useAt']}">${bbs.useAt === 'Y' ? '사용중' : '미사용'}</span>
+                            </div>
+                        </div>
+                    </li>`;
+                    bbsList.append(listItem);
+                });
+            } else {
+                const listItem = `<li class="li">
+                    <div class="in">
+                        <div class="card-top">
+                            <span  title="${messages['table.num']}">1</span>
+                            <div class="btn-area">
+                                <button type="button" class="sm">${messages['table.reger']} : </button>
+                                <button type="button" class="sm">데이터 없음</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <a href="#" class="c-text">
+                                <p class="c-tit"><span class="span">${messages['common.nodata.msg']}</span></p>
+                                <p class="c-date">
+                                    <strong class="key">${messages['table.regdate']}</strong>
+                                    <span class="value">데이터 없음</span>
+                                </p>
+                            </a>
+                        </div>
+                        <div class="card-btm">
+                            <span class="krds-badge" title="${messages['comCopBbs.boardMasterVO.list.useAt']}">미사용</span>
+                        </div>
+                    </div>
+                </li>`;
+                bbsList.append(listItem);
+            }
+        }
+
+        /*********************************************************
+         * 페이지네이션 렌더링 함수
+         ******************************************************** */
+        function renderPagination(paginationHtml) {
+            const pagination = $('#pagination');
+            pagination.empty();
+            pagination.append(paginationHtml);
+        }
+    </script>
+
+</body>
+</html>

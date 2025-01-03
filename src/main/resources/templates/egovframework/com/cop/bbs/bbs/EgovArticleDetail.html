@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:with="pageTitle=#{comCopBbs.articleVO.title}">
+    <meta charset="UTF-8">
+    <title th:text="${pageTitle} + ' ' + #{title.detail}"></title>
+    <link th:href="@{/css/pattern_css.css}" type="text/css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/ckeditor5_simple/ckeditor5.css}">
+    <link rel="stylesheet" th:href="@{/css/ckEditor_simple-main.css}">
+    <script src="/js/jquery-3.7.1.min.js"></script>
+    <style>
+        .page-btn-wrap{
+            margin-top: 0;
+        }
+        #comment-list, #satisfaction-list{
+            display: flex;
+            flex-direction: column;
+            gap: var(--krds-spacer-5);
+        }
+        #comment-list li, #satisfaction-list li{
+            background-color: #eee;
+            padding: 2rem;
+            border-radius: 1rem;
+        }
+        #comment-list li .info-body, #satisfaction-list li .info-body{
+            background-color: #fff;
+            padding: 2rem;
+            margin-top: 1rem;
+            border-radius: 0.5rem;
+        }
+        .search-list-top{
+            justify-content: flex-start;
+        }
+        /*.comment-close{*/
+        /*    position: absolute;*/
+        /*    top: 3.2rem;*/
+        /*    right: 3.2rem;*/
+        /*    z-index: 901;*/
+        /*    width: 3.6rem;*/
+        /*    height: 3.6rem;*/
+        /*    background: url("/img/component/common/ico_close_modal.svg") no-repeat center;*/
+        /*    background-size: 2rem;*/
+        /*}*/
+
+        .star {
+            position: relative;
+            font-size: 2rem;
+            color: transparent;
+            text-shadow: 0 0 0 #f0f0f0;
+        }
+
+        .star input {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .star span {
+            width: 0;
+            position: absolute;
+            left: 0;
+            color: rgba(250, 208, 0, 0.99);
+            overflow: hidden;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body th:with="pageTitle=#{comCopBbs.articleVO.title}">
+<!-- javascript warning tag  -->
+<noscript class="noScriptTitle" th:text="#{common.noScriptTitle.msg}"></noscript>
+<div class="conts-wrap scroll-check">
+    <div class="conts-wrap section-link" id="section_01">
+        <h3 class="sec-tit" th:text="${pageTitle} + ' ' + #{title.detail}"></h3>
+        <!-- table list -->
+        <div class="tbl-wrap" th:title="${#messages.msg('common.summary.inqire', pageTitle)}">
+            <dl class="tbl def-list">
+                <dt th:text="#{comCopBbs.articleVO.detail.nttSj}"></dt>
+                <dd id="nttSj"></dd>
+                <dt th:text="#{table.reger}"></dt>
+                <dd id="frstRegisterNm"></dd>
+                <dt th:text="#{table.regdate}"></dt>
+                <dd id="frstRegistPnttm"></dd>
+                <dt th:text="#{comCopBbs.articleVO.detail.inqireCo}"></dt>
+                <dd id="inqireCo"></dd>
+                <dt th:text="#{comCopBbs.articleVO.detail.nttCn}"></dt>
+                <dd id="nttCn" class="ck-content"></dd>
+                <dt th:text="#{comCopBbs.articleVO.detail.ntceDe}"></dt>
+                <dd id="ntceDe"></dd>
+            </dl>
+        </div>
+        <!-- //table list -->
+        <div class="page-btn-wrap both">
+            <button type="button" class="btn xlg tertiary" onclick="fn_egov_inqire_articlelist()" th:text="#{button.list}" th:title="#{title.list} + ' ' + #{input.button}"></button>
+
+            <div class="btn-wrap">
+                <button type="button" class="btn xlg" id="updateBtn" onclick="fn_egov_updt_view_bbs()" th:text="#{button.update}" th:title="#{title.update} + ' ' + #{input.button}"></button>
+                <button type="button" class="btn xlg" id="deleteBtn" onclick="fn_egov_delete_view_bbs()" th:text="#{button.delete}" th:title="#{button.delete} + ' ' + #{input.button}"></button>
+                <button type="button" class="btn xlg" id="replyBtn" onclick="fn_egov_reply_view_bbs()" th:text="#{button.reply}" th:title="#{button.reply} + ' ' + #{input.button}"></button>
+            </div>
+        </div>
+    </div>
+    <div class="comment-wrap txt-box bg-white">
+        <!--<div class="comment-list-wrap">
+            <div class="search-list-top">
+                <div class="sch-info">
+                    댓글
+                    <span class="keyword" id="commentCnt"></span>개
+                </div>
+            </div>
+            <ul id="comment-list" class="total-search-list"></ul>
+            <div class="pagination w-page"></div>
+        </div>-->
+        <div class="comment-list-wrap">
+            <div class="search-list-top">
+                <div class="sch-info">
+                    만족도
+                    <span class="keyword" id="satisAverage"></span>점
+                </div>
+                <div class="starAvr">
+                    <span class="star">★★★★★<span class="totalStar">★★★★★</span></span>
+                    <span>(<span class="satisfactionTotalCnt"></span>)</span>
+                </div>
+            </div>
+            <ul id="satisfaction-list" class="total-search-list"></ul>
+            <div class="pagination w-page"></div>
+        </div>
+
+
+<!--        <div class="commentInsert txt-box bg-white" style="gap: var(&#45;&#45;krds-spacer-3); margin-top: 0;">-->
+<!--            <ol class="assess-opinion-list">-->
+<!--                <li class="li">-->
+<!--                    <p class="form-qu">댓글 입력</p>-->
+<!--                    <div class="form-group full">-->
+<!--                        <div class="form-conts">-->
+<!--                            <div class="textarea-wrap">-->
+<!--                                <textarea id="answer" class="form-control" placeholder="내용을 입력해주세요." title="댓글 입력" style="height: 50%" maxlength="200"></textarea>-->
+<!--                                <p class="textarea-count">-->
+<!--                                    <span class="text-primary" id="recentTextCnt">0</span><span class="text-num" id="fullTextCnt">/200</span>-->
+<!--                                </p>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </li>-->
+<!--            </ol>-->
+<!--            <div class="btn-wrap">-->
+<!--                <button type="button" class="btn md" th:text="#{button.create}" style="float: right" onclick="fn_egov_comment_insert()"></button>-->
+<!--            </div>-->
+<!--        </div>-->
+        <div class="commentInsert txt-box bg-white" style="gap: var(--krds-spacer-3); margin-top: 0;">
+            <ol class="assess-opinion-list">
+                <li class="li">
+                    <p class="form-qu">만족도 내용</p>
+                    <span class="star">★★★★★
+                        <span class="stsStarCheck">★★★★★</span>
+		  			    <input type="range" oninput="drawStar()" value = "0" step="1" min="0" max="5" class = "star_range" name = "reviewStar">
+				    </span>
+                    <div class="form-group full">
+                        <div class="form-conts">
+                            <div class="textarea-wrap">
+                                <textarea id="answer" class="form-control" placeholder="내용을 입력해주세요." title="만족도 입력" style="height: 50%" maxlength="200"></textarea>
+                                <p class="textarea-count">
+                                    <span class="text-primary" id="recentTextCnt">0</span><span class="text-num" id="fullTextCnt">/200</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ol>
+            <div class="btn-wrap">
+<!--                <button type="button" class="btn md" th:text="#{button.create}" style="float: right" onclick="fn_egov_comment_insert()"></button>-->
+                <button type="button" class="btn md" th:text="#{button.create}" style="float: right" onclick="fn_egov_satisfaction_insert()"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    var bbsId = /*[[${bbsId}]]*/;
+    var nttId = /*[[${nttId}]]*/;
+    var frstRegistPnttm;
+
+    $(document).ready(function() {
+        /*********************************************************
+         * 페이지 로드 시 초기 데이터 가져오기
+         ******************************************************** */
+        fn_egov_inquire_article_detail(bbsId, nttId);
+        // fn_egov_comment_view_list(bbsId, nttId);
+        fn_egov_satistaction_view_list(bbsId,nttId);
+    });
+
+    /*********************************************************
+     * 조회 처리 함수
+     ******************************************************** */
+    function fn_egov_inquire_article_detail(bbsId, nttId) {
+        $.ajax({
+            url: '/cop/bbs/bbs/selectArticleDetail',
+            method: 'GET',
+            data: { bbsId: bbsId, nttId: nttId },
+            success: function (response) {
+                renderArticleDetail(response);
+            },
+            error: function (error) {
+                console.error("Error fetching article detail:", error);
+            }
+        });
+    }
+
+    /*********************************************************
+     * 게시글 렌더링 함수
+     ******************************************************** */
+    function renderArticleDetail(response) {
+        console.log(response);
+        if(response.noticeAt === "Y"){
+            $("#replyBtn").prop('disabled', true);
+        }
+        $('#nttSj').text(response.nttSj);
+        $('#frstRegisterNm').text(response.frstRegisterNm);
+        $('#frstRegistPnttm').text(response.frstRegistPnttm);
+        $('#inqireCo').text(response.rdcnt);
+        $('#nttCn').append(response.nttCn);
+        $('#ntceDe').text(response.ntceBgnde + " ~ " +response.ntceEndde);
+        // atchFileId가 null이 아닌 경우에만 동적으로 렌더링
+        if (response.atchFileId) {
+            var messages = /*[[#{comCopBbs.articleVO.detail.atchFile}]]*/;
+            let ddText = "";
+            const dtElement = $('<dt></dt>').text(messages);
+            const ddElement = $('<dd></dd>');
+            $('.tbl.def-list').append(dtElement).append(ddElement);
+            $.ajax({
+                url:"/cmm/fms/selectFileInfs",
+                method:"post",
+                data:{"atchFileId":response.atchFileId},
+                success:function(result){
+                    console.log(result);
+                    result.forEach(function(item){
+                        ddText += "<a href='/upload/files/"+item.orignlFileNm+"' download='"+item.orignlFileNm+"' style='display: block;'>"+item.orignlFileNm+"</a>"
+                    });
+                    ddElement.append(ddText);
+                }
+            })
+        }
+        frstRegistPnttm = response.frstRegistPnttm;
+    }
+
+    /*********************************************************
+     * 목록 버튼 처리 함수
+     ******************************************************** */
+    function fn_egov_inqire_articlelist() {
+        // 현재 URL에서 pageNum 파라미터 추출
+        var urlParams = new URLSearchParams(window.location.search);
+        var pageNum = urlParams.get('pageNum') || 1; // pageNum이 없으면 기본값으로 1 설정
+
+        // 목록 화면 URL로 이동, pageNum을 쿼리 파라미터로 포함
+        window.location.href = '/cop/bbs/bbs/selectArticleListView?bbsId=' + bbsId + '&pageNum=' + pageNum;
+    }
+
+    /*********************************************************
+     * 수정 버튼 처리 함수
+     ******************************************************** */
+    function fn_egov_updt_view_bbs() {
+        // 현재 URL에서 pageNum 파라미터 추출
+        var urlParams = new URLSearchParams(window.location.search);
+        var pageNum = urlParams.get('pageNum') || 1; // pageNum이 없으면 기본값으로 1 설정
+
+        // 목록 화면 URL로 이동, pageNum을 쿼리 파라미터로 포함
+        window.location.href = '/cop/bbs/bbs/insertArticleView?bbsId=' + bbsId +'&nttId='+nttId +'&pageNum=' + pageNum;
+    }
+
+    /*********************************************************
+     * 삭제 버튼 처리 함수
+     ******************************************************** */
+    function fn_egov_delete_view_bbs(){
+        $.ajax({
+            url: '/cop/bbs/bbs/deleteArticleDetail',
+            method: 'POST',
+            data: { bbsId: bbsId, nttId: nttId},
+            success:function(response){
+                alert(response);
+                window.location.href = '/cop/bbs/bbs/selectBBSMasterInfsView';
+            },
+            error:function(error){
+                console.log("에러");
+                console.log(error);
+            }
+        })
+    }
+
+    /*********************************************************
+     * 답글 버튼 처리 함수
+     ******************************************************** */
+    function fn_egov_reply_view_bbs(){
+        // 현재 URL에서 pageNum 파라미터 추출
+        var urlParams = new URLSearchParams(window.location.search);
+        var pageNum = urlParams.get('pageNum') || 1; // pageNum이 없으면 기본값으로 1 설정
+
+        // 목록 화면 URL로 이동, pageNum을 쿼리 파라미터로 포함
+        window.location.href = '/cop/bbs/bbs/insertArticleView?bbsId=' + bbsId +'&parnts='+nttId +'&pageNum=' + pageNum +'&replyAt=Y';
+    }
+
+
+    // /*********************************************************
+    //  * 댓글 목록 호출
+    //  ******************************************************** */
+    // function fn_egov_comment_view_list(bbsId, nttId,pageIndex){
+    //     $.ajax({
+    //         url:"/cop/cmt/selectArticleCommentList",
+    //         method:"POST",
+    //         data: { bbsId: bbsId, nttId: nttId, pageIndex:pageIndex},
+    //         success:function(result){
+    //             $("#comment-list li").remove();
+    //             $(".pagination.w-page").children().remove();
+    //             var response = result.response;
+    //             var commentList;
+    //
+    //             if(response.totalElements == 0){
+    //                 $("#commentCnt").text("0");
+    //                 $(".pagination").hide();
+    //             }else{
+    //                 response.content.forEach((item,index) => {
+    //                     commentList=`<li>
+    //                                     <p class="info-top">
+    //                                         <span class="user-info" style="width:100%"><span class="txt" style="font-weight: bold;">${item.wrterNm}</span> | <span class="i-date">${item.frstRegistPnttm.replace("T"," ")}</span></span>
+    //                                         <button type="button" class="comment-close" onclick="fn_egov_comment_delete('${item.bbsId}',${item.nttId},${item.answerNo})" style="background:url('/img/component/common/ico_close_modal.svg')no-repeat center center; width: 3.6rem; height:3.6rem; background-size: 2rem;"><span class="sr-only">닫기</span></button>
+    //                                     </p>
+    //                                     <div class="info-body"><div class="in"><div class="text"><p class="txt">${item.answer}</p></div></div></div>
+    //                                  </li>`;
+    //                     $("#comment-list").append(commentList);
+    //                 });
+    //                 $("#commentCnt").text(response.totalElements);
+    //                 $(".pagination").show();
+    //                 $(".pagination").append(result.pagination);
+    //             }
+    //         },
+    //         error:function(error){
+    //             alert("에러");
+    //             console.log(error);
+    //         }
+    //     })
+    // }
+
+    /*********************************************************
+     * 댓글 등록
+     ******************************************************** */
+    function fn_egov_comment_insert(){
+        const answer = $("#answer").val();
+        $.ajax({
+            url:"/cop/cmt/insertArticleComment",
+            method:"POST",
+            data: {bbsId:bbsId, nttId:nttId, answer:answer},
+            success: function(response){
+                alert(response);
+                fn_egov_comment_view_list(bbsId, nttId)
+                $("#answer").val("");
+                $("#recentTextCnt").val(0);
+            },
+            error: function(error){
+                alert('에러 발생 !!!');
+                console.log(error);
+            }
+        })
+    }
+
+    /*********************************************************
+     * 댓글입력 시 글자 수 카운트
+     ******************************************************** */
+    $("#answer").keyup(function(e){
+        const maxCnt = 200;
+       let comment = $(this).val();
+       let commentLen = 0;
+
+        let totalByte=0;
+        for(let i=0; i<comment.length; i++){
+            const each_char = comment.charAt(i);
+            const uni_char = escape(each_char); //유니코드 형식으로 변환
+            if(uni_char.length>4){
+                // 한글 : 2Byte
+                totalByte += 2;
+            }else{
+                // 영문,숫자,특수문자 : 1Byte
+                totalByte += 1;
+            }
+            if(totalByte <= maxCnt){
+                commentLen += 1;
+            }
+        }
+
+       if(comment.length == 0 || comment == ""){
+           $("#recentTextCnt").text(0);
+       }else{
+           $("#recentTextCnt").text(totalByte);
+       }
+
+       if(totalByte < 200){
+           $("#recentTextCnt").css("color","#246BEB");
+       }else{
+           $(this).val($(this).val().substring(0, commentLen));
+           $("#recentTextCnt").css("color","red");
+       }
+
+    });
+
+    function fn_egov_comment_delete(bbsId,nttId,answerNo){
+        $.ajax({
+            url:"/cop/cmt/deleteArticleComment",
+            method:"POST",
+            data:{bbsId:bbsId,nttId:nttId,answerNo:answerNo},
+            success:function(result){
+                alert(result);
+                fn_egov_comment_view_list(bbsId, nttId);
+            },
+            error:function(error){
+                alert("에러!");
+                console.log(error);
+            }
+        });
+    }
+
+    /*********************************************************
+     * 만족도조사 목록 호출
+     ******************************************************** */
+    function fn_egov_satistaction_view_list(bbsId, nttId, pageIndex){
+        $.ajax({
+            url:"/cop/stf/selectSatisfactionList",
+            method:"POST",
+            data: {bbsId:bbsId, nttId:nttId, pageIndex:pageIndex},
+            success: function(result){
+                var response = result.response.content;
+                $("#satisfaction-list li").remove();
+                $(".pagination.w-page").children().remove();
+
+                if(result.response.totalElements == 0){
+                    $(".pagination").hide();
+                }else{
+                    var stsfdgList;
+                    response.forEach((item,index) => {
+                        stsfdgList=`<li>
+                                    <p class="info-top">
+                                        <span class="user-info" style="width:100%"><span class="txt" style="font-weight: bold;">${item.wrterNm}</span> | <span class="i-date">${item.frstRegistPnttm.replace("T"," ")}</span></span>
+                                        <button type="button" class="satisfaction-close" onclick="fn_egov_satisfaction_delete('${item.bbsId}',${item.nttId},${item.stsfdgNo})" style="background:url('/img/component/common/ico_close_modal.svg')no-repeat center center; width: 3.6rem; height:3.6rem; background-size: 2rem;"><span class="sr-only">닫기</span></button>
+                                    </p>
+                                    <div class="stsfdg-area">
+                                        <span class="star" style="color:lightgray">★★★★★<span style="width:${item.stsfdg*20}%">★★★★★</span></span>
+                                    </div>
+                                    <div class="info-body"><div class="in"><div class="text"><p class="txt">${item.stsfdgCn}</p></div></div></div>
+                                 </li>`;
+                        $("#satisfaction-list").append(stsfdgList);
+                    });
+
+                    $("#satisAverage").text(result.satisAvr.toFixed(1));
+                    $(".totalStar").css("width",((result.satisAvr)*20)+'%');
+                    $(".satisfactionTotalCnt").text(result.response.totalElements);
+                    $(".pagination").show();
+                    $(".pagination").append(result.pagination);
+                }
+            },
+            error: function(error){
+                alert("에러!!");
+                console.log(error);
+            }
+        })
+    }
+
+    /*********************************************************
+     * 만족도조사 등록
+     ******************************************************** */
+    function fn_egov_satisfaction_insert(){
+        const answer = $("#answer").val();
+        const star = $(".star_range").val();
+        $.ajax({
+            url:"/cop/stf/insertSatisfaction",
+            method:"POST",
+            data: {bbsId:bbsId, nttId:nttId, stsfdgCn:answer, stsfdg:star},
+            success: function(response){
+                alert(response);
+                fn_egov_satistaction_view_list(bbsId, nttId)
+                $("#answer").val("");
+                $(".reviewStar").val(0);
+                $("#recentTextCnt").val(0);
+            },
+            error: function(error){
+                alert('에러 발생 !!!');
+                console.log(error);
+            }
+        })
+    }
+
+    function fn_egov_satisfaction_delete(bbsId,nttId,stsfdgNo){
+        $.ajax({
+            url:"/cop/stf/deleteSatisfaction",
+            method:"POST",
+            data:{bbsId:bbsId,nttId:nttId,stsfdgNo:stsfdgNo},
+            success:function(result){
+                alert(result);
+                fn_egov_satistaction_view_list(bbsId, nttId)
+            },
+            error:function(error){
+                alert("에러!");
+                console.log(error);
+            }
+        });
+    }
+
+    function drawStar(){
+        var starval = $(".star_range").val();
+        console.log(starval);
+        var starvalue = starval * 20;
+        $(".stsStarCheck").css("width", starvalue+"%");
+    }
+
+    // function linkPage(pageIndex) {
+    //     fn_egov_comment_view_list(bbsId, nttId,pageIndex)
+    // }
+
+    function linkPage(pageIndex) {
+        fn_egov_satistaction_view_list(bbsId, nttId,pageIndex)
+    }
+
+</script>
+
+</body>
+</html>

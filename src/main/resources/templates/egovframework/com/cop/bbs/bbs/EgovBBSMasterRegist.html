@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:with="pageTitle=#{comCopBbs.boardMasterVO.title}">
+    <meta charset="UTF-8">
+    <title th:text="${pageTitle} + ' ' + #{title.create}"></title>
+    <link th:href="@{/css/pattern_css.css}" type="text/css" rel="stylesheet">
+    <script src="/js/jquery-3.7.1.min.js"></script>
+</head>
+<body th:with="pageTitle=#{comCopBbs.boardMasterVO.title}">
+<!-- javascript warning tag  -->
+<noscript class="noScriptTitle" th:text="#{common.noScriptTitle.msg}"></noscript>
+    <div>
+        <h1 th:text="${pageTitle} + ' ' + #{title.create}"></h1><!--게시판 등록-->
+        <!-- 게시판 등록 입력폼 -->
+        <div class="txt-box bg-white" th:title="#{common.summary.regist(${pageTitle})}">
+            <div class="box-cnt">
+                <div class="box-sec">
+                    <div class="form-group"><!--게시판명-->
+                        <div class="form-tit" th:text="#{comCopBbs.boardMasterVO.regist.bbsNm}"></div>
+                        <div class="form-conts">
+                            <input type="text" name="bbsNm" id="name-input" class="form-control" placeholder="입력하세요" th:title="#{comCopBbs.boardMasterVO.regist.bbsNm} + ' ' + #{input.input}">
+                        </div>
+                    </div>
+                    <div class="form-group"><!--게시판소개내용-->
+                        <div class="form-tit" th:text="#{comCopBbs.boardMasterVO.regist.bbsIntrcn}"></div>
+                        <div class="form-group full">
+                            <div class="form-conts">
+                                <div class="textarea-wrap">
+                                    <textarea name="bbsIntrcn" id="bbsIntrcn" class="form-control" placeholder="입력하세요"></textarea>
+                                    <p class="textarea-count">
+                                        <span class="text-primary" id="charCount">0</span><span class="text-num">/20</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group"><!--게시판 유형-->
+                        <div class="form-tit" th:text="#{comCopBbs.boardMasterVO.regist.bbsTyCode}"></div>
+                        <div class="form-conts">
+                            <select name="bbsTyCode" id="bbsTypeSelect" class="form-select">
+                                <!--동적 렌더링-->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group"><!--답장가능여부-->
+                        <div class="form-tit" th:text="#{comCopBbs.boardMasterVO.regist.replyPosblAt}"></div>
+                        <div class="form-conts">
+                            <div id="test" class="row chk-area" th:title="#{comCopBbs.boardMasterVO.regist.replyPosblAt} + ' ' + #{input.input}">
+                                <div class="form-check lg">
+                                    <input type="radio" name="replyPosblAt" id="rdo_1-1" value="Y" checked="">
+                                    <label for="rdo_1-1">예</label>
+                                </div>
+                                <div class="form-check lg">
+                                    <input type="radio" name="replyPosblAt" id="rdo_1-2" value="N">
+                                    <label for="rdo_1-2">아니오</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group"><!--파일첨부가능여부-->
+                        <div class="form-tit" th:text="#{comCopBbs.boardMasterVO.regist.fileAtchPosblAt}"></div>
+                        <div class="form-conts">
+                            <div class="row chk-area" th:title="#{comCopBbs.boardMasterVO.regist.fileAtchPosblAt} + ' ' + #{input.input}">
+                                <div class="form-check lg">
+                                    <input type="radio" name="fileAtchPosblAt" id="rdo_2-1" value="Y" checked="">
+                                    <label for="rdo_2-1">예</label>
+                                </div>
+                                <div class="form-check lg">
+                                    <input type="radio" name="fileAtchPosblAt" id="rdo_2-2" value="N">
+                                    <label for="rdo_2-2">아니오</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group"><!--첨부가능파일숫자-->
+                        <div class="form-tit" th:text="#{comCopBbs.boardMasterVO.regist.atchPosblFileNumber}"></div>
+                        <div class="form-conts">
+                            <select name="atchPosblFileNumber" id="fileNumberSelect" class="form-select">
+                                <option value="0">없음</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group"><!--추가선택사항-->
+                        <div class="form-tit" th:text="#{comCopBbs.boardMasterVO.detail.option}"></div>
+                        <div class="form-conts">
+                            <select name="option" id="additionalOptionSelect" class="form-select">
+                                <!--동적 렌더링-->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group"><!--사용여부-->
+                        <div class="form-tit" th:text="#{comCopBbs.boardMasterVO.regist.useAt}"></div>
+                        <div class="form-conts">
+                            <div class="row chk-area" th:title="#{comCopBbs.boardMasterVO.regist.useAt} + ' ' + #{input.input}">
+                                <div class="form-check lg">
+                                    <input type="radio" name="useAt" id="rdo_3-1" value="Y" checked="">
+                                    <label for="rdo_3-1">예</label>
+                                </div>
+                                <div class="form-check lg">
+                                    <input type="radio" name="useAt" id="rdo_3-2" value="N">
+                                    <label for="rdo_3-2">아니오</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- //게시판 등록 입력폼 -->
+        </div>
+        <div class="page-btn-wrap both">
+            <button type="button" class="btn xlg tertiary" onclick="window.history.back();" th:text="#{button.list}" th:title="#{button.list} + ' ' + #{input.button}"></button>
+
+            <div class="btn-wrap">
+                <button type="button" class="btn xlg" onclick="fn_egov_regist_bbs()" th:text="#{button.create}" th:title="#{button.create} + ' ' + #{input.button}"></button>
+            </div>
+        </div>
+    </div>
+
+<script th:inline="javascript">
+
+    $(document).ready(function() {
+        /*********************************************************
+         * 페이지 로드 시 초기 데이터 가져오기
+         ******************************************************** */
+        $.ajax({
+            url: '/cop/bbs/bbs/boardSetupInfo',
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                renderBbsTypeSelect(data.codeResult);
+                renderAdditionalOptionSelect(data.useComment, data.useSatisfaction);
+            },
+            error: function (error) {
+                console.error("AJAX Error : ", error);
+            }
+        });
+
+        /*********************************************************
+         * textarea 글자 수 제한 함수
+         ******************************************************** */
+        $('#bbsIntrcn').on('input', function() {
+            let length = $(this).val().length;
+            if (length > 20) {
+                $(this).val($(this).val().substring(0, 20));
+                length = 20;
+            }
+            $('#charCount').text(length);
+        });
+
+        /*********************************************************
+         * 파일 첨부 유형 별 첨부 파일 개수 활성/비활성 전환 함수
+         ******************************************************** */
+        $('input[name="fileAtchPosblAt"]').on('change', function() {
+            const isFileAtchNotAllowed = $('input[name="fileAtchPosblAt"]:checked').val() === 'N';
+            $('#fileNumberSelect').prop('disabled', isFileAtchNotAllowed);
+            if (isFileAtchNotAllowed) {
+                $('#fileNumberSelect').val('0');
+            }
+        });
+
+        /*********************************************************
+         * 게시판 유형 별 선택 요소 활성/비활성 전환 함수
+         ******************************************************** */
+        let previousValue = $('#bbsTypeSelect').val();
+        $('#bbsTypeSelect').on('change', function() {
+            const newValue = $(this).val();
+            const isGuestBook = (newValue === 'BBST03');
+            const wasGuestBook = (previousValue === 'BBST03');
+
+            if (!wasGuestBook && isGuestBook) {
+                // 방명록 외 선택에서 방명록 선택 시
+                $('input[name="replyPosblAt"]').prop('disabled', true).filter('[value="N"]').prop('checked', true);
+                $('input[name="fileAtchPosblAt"]').prop('disabled', true).filter('[value="N"]').prop('checked', true);
+                $('#fileNumberSelect').prop('disabled', true).val('0');
+                $('#additionalOptionSelect').prop('disabled', true).val('');
+            } else if (wasGuestBook && !isGuestBook) {
+                // 방명록 선택에서 방명록 외 선택 시
+                $('input[name="replyPosblAt"]').prop('disabled', false).prop('checked', true);
+                $('input[name="fileAtchPosblAt"]').prop('disabled', false).prop('checked', true);
+                $('#additionalOptionSelect').prop('disabled', false);
+            }
+
+            previousValue = newValue;
+        });
+    });
+
+    /*********************************************************
+     * select option 렌더링 함수 (게시판 유형)
+     ******************************************************** */
+    function renderBbsTypeSelect(optionsData) {
+        var selectElement = $("#bbsTypeSelect");
+
+        // 첫 번째 옵션 추가
+        selectElement.append($('<option>', {
+            value: "",
+            text: "선택하세요"
+        }));
+
+        // 옵션 데이터 추가
+        optionsData.forEach(function (item) {
+            selectElement.append($('<option>', {
+                value: item.code,
+                text: item.codeNm
+            }));
+        });
+    }
+
+    /*********************************************************
+     * select option 렌더링 함수 (추가선택사항)
+     ******************************************************** */
+    function renderAdditionalOptionSelect(useComment, useSatisfaction) {
+        var selectElement = $("#additionalOptionSelect");
+
+        // 첫 번째 옵션 추가
+        selectElement.append($('<option>', {
+            value: "",
+            text: "미선택"
+        }));
+
+        // 조건부 옵션 데이터 추가
+        if (useComment) {
+            selectElement.append($('<option>', {
+                value: "comment",
+                text: "댓글"
+            }));
+        }
+        if (useSatisfaction) {
+            selectElement.append($('<option>', {
+                value: "stsfdg",
+                text: "만족도조사"
+            }));
+        }
+    }
+
+    /*********************************************************
+     * 등록 처리 함수
+     ******************************************************** */
+    function fn_egov_regist_bbs() {
+
+        //방명록 게시판의 경우 답장 불가, 파일첨부 불가
+        if ($('#bbsTypeSelect').val() === 'BBST03') {
+            if ($('input[name="replyPosblAt"]:checked').val() === 'Y') {
+                alert(/*[[#{comCopBbs.boardMasterVO.guestReply}]]*/);
+                return;
+            }
+            if ($('input[name="fileAtchPosblAt"]:checked').val() === 'Y') {
+                alert(/*[[#{comCopBbs.boardMasterVO.guestFile}]]*/);
+                return;
+            }
+        } else {
+            if ($('input[name="fileAtchPosblAt"]:checked').val() === 'Y' && $('#fileNumberSelect').val() === '0') {
+                alert('첨부가능파일 숫자를 선택하세요.');
+                return;
+            }
+        }
+        // 컨펌 메시지
+        if (!confirm(/*[[#{common.regist.msg}]]*/)) {
+            return;
+        }
+
+        // 입력된 데이터 수집
+        const data = {
+            bbsNm: $('#name-input').val(),
+            bbsIntrcn: $('#bbsIntrcn').val(),
+            bbsTyCode: $('#bbsTypeSelect').val(),
+            replyPosblAt: $('input[name="replyPosblAt"]:checked').val(),
+            fileAtchPosblAt: $('input[name="fileAtchPosblAt"]:checked').val(),
+            atchPosblFileNumber: $('#fileNumberSelect').val(),
+            option: $('#additionalOptionSelect').val(),
+            useAt: $('input[name="useAt"]:checked').val()
+        };
+
+        // 서버로 데이터 전송
+        $.ajax({
+            url: '/cop/bbs/bbs/insertBBSMaster', // 실제 서버 URL로 변경
+            type: 'post',
+            contentType: "application/json",
+            data: JSON.stringify(data),
+            success: function(response) {
+                alert(response);
+                window.location.href = '/cop/bbs/bbs/selectBBSMasterInfsView';
+            },
+            error: function(error) {
+                if (error.responseJSON) {
+                    let errorMessage = '';
+                    for (let key in error.responseJSON) {
+                        errorMessage += `${error.responseJSON[key]}\n`;
+                    }
+                    alert(errorMessage);
+                } else {
+                    alert('게시판 등록에 실패했습니다.');
+                }
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
