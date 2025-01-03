@@ -952,6 +952,8 @@ public class EgovStringUtil {
 	                .replace("&#34;", "\"")
 	                .replace("<br>", "\n")
 	                .replace("<br/>", "\n")
-	                .replace("<br />", "\n");
+	                .replace("<br />", "\n")
+	    			.replace("<p>", "")
+	    			.replace("</p>", "");
 	}
 }

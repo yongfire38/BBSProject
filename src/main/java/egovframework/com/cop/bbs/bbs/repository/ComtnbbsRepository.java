@@ -84,7 +84,4 @@ public interface ComtnbbsRepository extends JpaRepository<Comtnbbs, ComtnbbsId> 
 
     List<Comtnbbs> findAllByComtnbbsIdAndSortOrdr(ComtnbbsId comtnbbsId,long SortOrdr);
     List<Comtnbbs> findAllByParntscttNo(int parntscttNo);
-
-    @Query(value = "SELECT CEIL(COUNT(NTT_ID) / 2000) AS queryCnt FROM Comtnbbs", nativeQuery = true)
-	int findQueryCnt();
 }
