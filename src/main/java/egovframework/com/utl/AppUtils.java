@@ -94,6 +94,16 @@ public class AppUtils {
         BeanUtils.copyProperties(satisfactionVO,comtnstsfdg);
         return comtnstsfdg;
     }
-
-
+    
+    public static BoardManageVO bbsManageEntityToVO(Comtnbbsmanage comtnbbsmanage){
+    	BoardManageVO boardManageVO = new BoardManageVO();
+    	BeanUtils.copyProperties(comtnbbsmanage, boardManageVO);
+    	return boardManageVO;
+    }
+    
+    public static Comtnbbsmanage bbsManageVOToEntity(BoardManageVO boardManageVO){
+    	Comtnbbsmanage comtnbbsmanage = new Comtnbbsmanage();
+    	BeanUtils.copyProperties(boardManageVO, comtnbbsmanage);
+    	return comtnbbsmanage;
+    } 
 }

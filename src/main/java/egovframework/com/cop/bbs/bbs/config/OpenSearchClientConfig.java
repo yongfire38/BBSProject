@@ -1,6 +1,7 @@
 package egovframework.com.cop.bbs.bbs.config;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.security.KeyStore;
 
 import javax.net.ssl.SSLContext;
@@ -65,7 +66,8 @@ public class OpenSearchClientConfig {
         SSLContext sslContext;
         
         try {
-            keyStore = KeyStore.getInstance(new File(keystorePath), keystorePassword.toCharArray());
+        	keyStore = KeyStore.getInstance("JKS");  // cacerts는 JKS 타입입니다
+            keyStore.load(new FileInputStream(keystorePath), keystorePassword.toCharArray());
             sslContext = SSLContextBuilder
                     .create()
                     .loadTrustMaterial(keyStore, new TrustSelfSignedStrategy())

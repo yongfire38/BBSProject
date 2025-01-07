@@ -1,6 +1,9 @@
 package egovframework.com.cop.bbs.bbs.service.impl;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,8 +19,10 @@ import org.springframework.stereotype.Service;
 
 import egovframework.com.cop.bbs.bbs.entity.Comtnbbs;
 import egovframework.com.cop.bbs.bbs.entity.ComtnbbsId;
+import egovframework.com.cop.bbs.bbs.entity.Comtnbbsmanage;
 import egovframework.com.cop.bbs.bbs.entity.Comtncomment;
 import egovframework.com.cop.bbs.bbs.repository.ComtnbbsRepository;
+import egovframework.com.cop.bbs.bbs.repository.ComtnbbsmanageRepository;
 import egovframework.com.cop.bbs.bbs.repository.ComtnbbsmasteroptnRepository;
 import egovframework.com.cop.bbs.bbs.repository.ComtncommentRepository;
 import egovframework.com.cop.bbs.bbs.service.BBSDTO;
@@ -28,22 +33,32 @@ import egovframework.com.cop.bbs.bbs.service.BoardMasterVO;
 import egovframework.com.cop.bbs.bbs.service.BoardVO;
 import egovframework.com.cop.bbs.bbs.service.EgovArticleService;
 import egovframework.com.utl.AppUtils;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class EgovArticleServiceImpl implements EgovArticleService {
 
     private final ComtnbbsRepository comtnbbsRepository;
     private final ComtncommentRepository comtncommentRepository;
     private final ComtnbbsmasteroptnRepository comtnbbsmasteroptnRepository;
+    private final ComtnbbsmanageRepository comtnbbsmanageRepository;
 
     @Qualifier("egovArticleIdGnrService")
     private final EgovIdGnrService idgenServiceArticle;
+    
+    @Qualifier("egovSyncIdGnrService")
+    private final EgovIdGnrService idgenServiceManager;
 
-    public EgovArticleServiceImpl(ComtnbbsRepository comtnbbsRepository, ComtncommentRepository comtncommentRepository, ComtnbbsmasteroptnRepository comtnbbsmasteroptnRepository, @Qualifier("egovArticleIdGnrService") EgovIdGnrService idgenServiceArticle) {
+    public EgovArticleServiceImpl(ComtnbbsRepository comtnbbsRepository, ComtncommentRepository comtncommentRepository, ComtnbbsmasteroptnRepository comtnbbsmasteroptnRepository, ComtnbbsmanageRepository comtnbbsmanageRepository, 
+    		@Qualifier("egovArticleIdGnrService") EgovIdGnrService idgenServiceArticle, @Qualifier("egovSyncIdGnrService") EgovIdGnrService idgenServiceManager
+    		) {
         this.comtnbbsRepository = comtnbbsRepository;
         this.comtncommentRepository = comtncommentRepository;
         this.comtnbbsmasteroptnRepository = comtnbbsmasteroptnRepository;
+		this.comtnbbsmanageRepository = comtnbbsmanageRepository;
         this.idgenServiceArticle = idgenServiceArticle;
+		this.idgenServiceManager = idgenServiceManager;
     }
 
     @Override
@@ -91,65 +106,79 @@ public class EgovArticleServiceImpl implements EgovArticleService {
 
     @Override
     public void insertArticle(BoardVO boardVO) throws Exception{
-        if ("Y".equals(boardVO.getReplyAt())) {
-            BBSDTO bbsdto = comtnbbsRepository.selectArticleDetail(boardVO.getBbsId(), Long.valueOf(boardVO.getParnts()));
-            // 답글인 경우 1. Parnts를 세팅, 2.Parnts의 sortOrdr을 현재글의 sortOrdr로 가져오도록, 3.nttNo는 현재 게시판의 순서대로
-            // replyLc는 부모글의 ReplyLc + 1
-            if(boardVO.getNttId() == 0){
-                boardVO.setSortOrdr(bbsdto.getSortOrdr());
-                boardVO.setReplyLc(String.valueOf(bbsdto.getAnswerLc() + 1));
-                boardVO.setNttNo(comtnbbsRepository.selectNttNo(boardVO.getBbsId(), boardVO.getSortOrdr()));
+    	
+    	long nttId = idgenServiceArticle.getNextLongId();
+    	
+    	try {
+    		if ("Y".equals(boardVO.getReplyAt())) {
+                BBSDTO bbsdto = comtnbbsRepository.selectArticleDetail(boardVO.getBbsId(), Long.valueOf(boardVO.getParnts()));
+                // 답글인 경우 1. Parnts를 세팅, 2.Parnts의 sortOrdr을 현재글의 sortOrdr로 가져오도록, 3.nttNo는 현재 게시판의 순서대로
+                // replyLc는 부모글의 ReplyLc + 1
+                if(boardVO.getNttId() == 0){
+                    boardVO.setSortOrdr(bbsdto.getSortOrdr());
+                    boardVO.setReplyLc(String.valueOf(bbsdto.getAnswerLc() + 1));
+                    boardVO.setNttNo(comtnbbsRepository.selectNttNo(boardVO.getBbsId(), boardVO.getSortOrdr()));
 
-                System.out.println("계산 후 LC 번호 >> " + boardVO.getReplyLc());
+                    System.out.println("계산 후 LC 번호 >> " + boardVO.getReplyLc());
 
-                // 답글에 대한 nttId 생성 후 nttId에 set +++
-                long nttId = idgenServiceArticle.getNextLongId();
-                boardVO.setNttId(nttId);
-                boardVO.setFrstRegistPnttm(LocalDateTime.now());
+                    // 답글에 대한 nttId 생성 후 nttId에 set +++
+                    //long nttId = idgenServiceArticle.getNextLongId();
+                    boardVO.setNttId(nttId);
+                    boardVO.setFrstRegistPnttm(LocalDateTime.now());
 
-                //더미데이터
-                boardVO.setNtcrNm("테스트1");
-                boardVO.setNtcrId("USRCNFRM_00000000000");
+                    //더미데이터
+                    boardVO.setNtcrNm("테스트1");
+                    boardVO.setNtcrId("USRCNFRM_00000000000");
 
+                }
+
+            } else {
+                // 답글이 아닌경우 Parnts = 0, replyLc는 = 0, sortOrdr = nttNo(Query에서 처리)
+                boardVO.setParnts("0");
+                boardVO.setReplyLc("0");
+                boardVO.setReplyAt("N");
+
+                if(boardVO.getNttId() == 0){
+                    //long nttId = idgenServiceArticle.getNextLongId();
+                    boardVO.setNttId(nttId);
+                    boardVO.setFrstRegistPnttm(LocalDateTime.now());
+
+                    //더미데이터
+                    boardVO.setNtcrNm("테스트1");
+                    boardVO.setNtcrId("USRCNFRM_00000000000");
+
+                }
+
+                boardVO.setSortOrdr(boardVO.getNttId());
             }
 
-        } else {
-            // 답글이 아닌경우 Parnts = 0, replyLc는 = 0, sortOrdr = nttNo(Query에서 처리)
-            boardVO.setParnts("0");
-            boardVO.setReplyLc("0");
-            boardVO.setReplyAt("N");
-
-            if(boardVO.getNttId() == 0){
-                long nttId = idgenServiceArticle.getNextLongId();
-                boardVO.setNttId(nttId);
-                boardVO.setFrstRegistPnttm(LocalDateTime.now());
-
-                //더미데이터
-                boardVO.setNtcrNm("테스트1");
-                boardVO.setNtcrId("USRCNFRM_00000000000");
-
+            if(boardVO.getFrstRegistPnttm() != null){
+                System.out.println("게시글 수정");
+                boardVO.setLastUpdusrId("USRCNFRM_00000000000");
+                boardVO.setLastUpdtPnttm(LocalDateTime.now());
             }
 
-            boardVO.setSortOrdr(boardVO.getNttId());
-        }
+            /* 익명글 처리 */
+            if(boardVO.getAnonymousAt().equals("Y")){
+                boardVO.setNtcrId("annoymous");
+                boardVO.setNtcrNm("익명");
+            }
 
-        if(boardVO.getFrstRegistPnttm() != null){
-            System.out.println("게시글 수정");
-            boardVO.setLastUpdusrId("USRCNFRM_00000000000");
-            boardVO.setLastUpdtPnttm(LocalDateTime.now());
-        }
+            //더미데이터
+            boardVO.setNtcrNm("테스트1");
+            boardVO.setNtcrId("USRCNFRM_00000000000");
 
-        /* 익명글 처리 */
-        if(boardVO.getAnonymousAt().equals("Y")){
-            boardVO.setNtcrId("annoymous");
-            boardVO.setNtcrNm("익명");
-        }
-
-        //더미데이터
-        boardVO.setNtcrNm("테스트1");
-        boardVO.setNtcrId("USRCNFRM_00000000000");
-
-        comtnbbsRepository.save(AppUtils.bbsVOToEntity(boardVO));
+            comtnbbsRepository.save(AppUtils.bbsVOToEntity(boardVO));
+            
+            // 이력관리 mySql 테이블에 코드 "N"으로 저장
+            insertToBbsManageInfo(nttId, boardVO.getBbsId(), "N");
+            
+    	} catch (Exception e) {
+    		// 예외 발생 시, 이력관리 mySql 테이블에 코드 "E"로 저장
+    		insertToBbsManageInfo(nttId, boardVO.getBbsId(), "E");
+    		log.error("Error occurred during insertion or indexing:", e);
+    		throw e;
+    	}
     }
 
     @Override
@@ -195,6 +224,7 @@ public class EgovArticleServiceImpl implements EgovArticleService {
             parntsItem(bbs.getComtnbbsId().getBbsId(),bbs.getComtnbbsId().getNttId());
         }
     }
+    
     public void parntsItem(String bbsId, long nttId){
         List<Comtnbbs> rList = comtnbbsRepository.findAllByParntscttNo((int)nttId);
         List<Comtncomment> commentList = comtncommentRepository.findAllByComtncommentId_BbsIdAndComtncommentId_NttId(bbsId,nttId);
@@ -211,5 +241,24 @@ public class EgovArticleServiceImpl implements EgovArticleService {
                 comtncommentRepository.save(comment);
             }
         }
+    }
+    
+    private void insertToBbsManageInfo(Long nttId, String bbsId, String syncSttusCode) throws Exception {
+    	Comtnbbsmanage comtnbbsmanage = new Comtnbbsmanage();
+    	ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+		Date localDate = Date.from(now.toInstant());
+		
+		String syncId = idgenServiceManager.getNextStringId();
+		comtnbbsmanage.setSyncId(syncId);
+		comtnbbsmanage.setNttId(nttId);
+		comtnbbsmanage.setBbsId(bbsId);
+		comtnbbsmanage.setSyncSttusCode(syncSttusCode);
+		comtnbbsmanage.setRegistPnttm(localDate);
+		
+		if(syncSttusCode.equals("E")) {
+			comtnbbsmanage.setErrorPnttm(localDate);
+		}
+		
+		AppUtils.bbsManageEntityToVO(comtnbbsmanageRepository.save(comtnbbsmanage));
     }
 }

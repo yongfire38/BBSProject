@@ -25,7 +25,7 @@ public class Comtnbbsmanage {
 	@Column(name="NTT_ID", length=20)
 	private Long nttId;
 	
-	@Column(name="BBS_ID", length=20)
+	@Column(name="BBS_ID", length=40)
 	private String bbsId;
 	
 	@Column(name="SYNC_STTUS_CODE", length=1)
