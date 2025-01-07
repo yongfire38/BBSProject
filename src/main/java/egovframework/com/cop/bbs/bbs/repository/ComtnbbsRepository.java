@@ -2,6 +2,7 @@ package egovframework.com.cop.bbs.bbs.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -75,6 +76,9 @@ public interface ComtnbbsRepository extends JpaRepository<Comtnbbs, ComtnbbsId> 
     	       "LEFT JOIN a.comtnbbsmaster c " +
     	       "WHERE a.useAt = 'Y'")
     List<BBSDTO>selectAllArticle();
+    
+    //NTT_ID에 해당하는 데이터를 가져오는 메서드
+    Optional<Comtnbbs> findByComtnbbsIdNttId(Long nttId);
     
     @Query("SELECT IFNULL(MAX(c.sortOrdr),0)+1 AS nttNo FROM Comtnbbs c WHERE c.comtnbbsId.bbsId = :bbsId")
     int selectSortOrder(@Param("bbsId") String bbsId);

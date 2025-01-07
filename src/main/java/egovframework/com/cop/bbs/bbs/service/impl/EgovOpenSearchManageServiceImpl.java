@@ -61,6 +61,9 @@ public class EgovOpenSearchManageServiceImpl extends EgovAbstractServiceImpl imp
 	@Value("${opensearch.embedding.indexname}")
     public String embeddingIndexName;
 	
+	@Value("${opensearch.index.size}")
+    public int indexSize;
+	
 	private final OpenSearchClient client;
 	
 	private final ComtnbbsRepository comtnbbsRepository;
@@ -612,7 +615,7 @@ public class EgovOpenSearchManageServiceImpl extends EgovAbstractServiceImpl imp
 	public void insertTotalEmbeddingData() {
 		EmbeddingModel embeddingModel = new OnnxEmbeddingModel(modelPath, tokenizerPath, PoolingMode.MEAN);
 		
-		int pageSize = 2000; // 페이지 크기를 변수로 설정
+		int pageSize = indexSize; // 인덱싱 시, 분할 처리할 수
 	    long totalCount = comtnbbsRepository.count(); // 전체 데이터 수 조회
 	    int totalPages = (int) Math.ceil((double) totalCount / pageSize);
 

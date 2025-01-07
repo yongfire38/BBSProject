@@ -181,6 +181,9 @@
     var bbsId = /*[[${bbsId}]]*/;
     var nttId = /*[[${nttId}]]*/;
     var frstRegistPnttm;
+    var answerAt;
+    var parntscttNo;
+    var sortOrdr;
 
     $(document).ready(function() {
         /*********************************************************
@@ -242,7 +245,10 @@
                 }
             })
         }
+        answerAt = response.answerAt;
+        parntscttNo = response.parntscttNo;
         frstRegistPnttm = response.frstRegistPnttm;
+        sortOrdr = response.sortOrdr;
     }
 
     /*********************************************************
@@ -266,7 +272,11 @@
         var pageNum = urlParams.get('pageNum') || 1; // pageNum이 없으면 기본값으로 1 설정
 
         // 목록 화면 URL로 이동, pageNum을 쿼리 파라미터로 포함
-        window.location.href = '/cop/bbs/bbs/insertArticleView?bbsId=' + bbsId +'&nttId='+nttId +'&pageNum=' + pageNum;
+        if(answerAt == "Y"){
+            window.location.href = '/cop/bbs/bbs/insertArticleView?bbsId=' + bbsId+'&nttId='+nttId +'&parnts='+parntscttNo +'&pageNum=' + pageNum +'&replyAt=Y';
+        }else{
+            window.location.href = '/cop/bbs/bbs/insertArticleView?bbsId=' + bbsId +'&nttId='+nttId +'&pageNum=' + pageNum;
+        }
     }
 
     /*********************************************************
@@ -297,7 +307,7 @@
         var pageNum = urlParams.get('pageNum') || 1; // pageNum이 없으면 기본값으로 1 설정
 
         // 목록 화면 URL로 이동, pageNum을 쿼리 파라미터로 포함
-        window.location.href = '/cop/bbs/bbs/insertArticleView?bbsId=' + bbsId +'&parnts='+nttId +'&pageNum=' + pageNum +'&replyAt=Y';
+        window.location.href = '/cop/bbs/bbs/insertArticleView?bbsId=' + bbsId +'&parnts='+nttId + '&sortOrdr='+sortOrdr +'&pageNum=' + pageNum +'&replyAt=Y';
     }
 
 

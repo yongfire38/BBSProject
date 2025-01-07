@@ -1,14 +1,12 @@
 package egovframework.com.cop.bbs.bbs.service.impl;
 
-import egovframework.com.cop.bbs.bbs.entity.Comtnbbs;
-import egovframework.com.cop.bbs.bbs.entity.ComtnbbsId;
-import egovframework.com.cop.bbs.bbs.entity.Comtnbbsmasteroptn;
-import egovframework.com.cop.bbs.bbs.entity.Comtncomment;
-import egovframework.com.cop.bbs.bbs.repository.ComtnbbsRepository;
-import egovframework.com.cop.bbs.bbs.repository.ComtnbbsmasteroptnRepository;
-import egovframework.com.cop.bbs.bbs.repository.ComtncommentRepository;
-import egovframework.com.cop.bbs.bbs.service.*;
-import egovframework.com.utl.AppUtils;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.transaction.Transactional;
+
 import org.egovframe.rte.fdl.idgnr.EgovIdGnrService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
@@ -16,13 +14,20 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import egovframework.com.cop.bbs.bbs.entity.Comtnbbs;
+import egovframework.com.cop.bbs.bbs.entity.ComtnbbsId;
+import egovframework.com.cop.bbs.bbs.entity.Comtncomment;
+import egovframework.com.cop.bbs.bbs.repository.ComtnbbsRepository;
+import egovframework.com.cop.bbs.bbs.repository.ComtnbbsmasteroptnRepository;
+import egovframework.com.cop.bbs.bbs.repository.ComtncommentRepository;
+import egovframework.com.cop.bbs.bbs.service.BBSDTO;
+import egovframework.com.cop.bbs.bbs.service.BBSListDTO;
+import egovframework.com.cop.bbs.bbs.service.Board;
+import egovframework.com.cop.bbs.bbs.service.BoardMaster;
+import egovframework.com.cop.bbs.bbs.service.BoardMasterVO;
+import egovframework.com.cop.bbs.bbs.service.BoardVO;
+import egovframework.com.cop.bbs.bbs.service.EgovArticleService;
+import egovframework.com.utl.AppUtils;
 
 @Service
 public class EgovArticleServiceImpl implements EgovArticleService {
@@ -86,14 +91,16 @@ public class EgovArticleServiceImpl implements EgovArticleService {
 
     @Override
     public void insertArticle(BoardVO boardVO) throws Exception{
-
         if ("Y".equals(boardVO.getReplyAt())) {
+            BBSDTO bbsdto = comtnbbsRepository.selectArticleDetail(boardVO.getBbsId(), Long.valueOf(boardVO.getParnts()));
             // 답글인 경우 1. Parnts를 세팅, 2.Parnts의 sortOrdr을 현재글의 sortOrdr로 가져오도록, 3.nttNo는 현재 게시판의 순서대로
             // replyLc는 부모글의 ReplyLc + 1
-            if(boardVO.getFrstRegistPnttm() == null){
-                boardVO.setReplyLc(String.valueOf(Integer.parseInt(boardVO.getReplyLc()) + 1));
-                boardVO.setSortOrdr(Long.valueOf(boardVO.getParnts()));
+            if(boardVO.getNttId() == 0){
+                boardVO.setSortOrdr(bbsdto.getSortOrdr());
+                boardVO.setReplyLc(String.valueOf(bbsdto.getAnswerLc() + 1));
                 boardVO.setNttNo(comtnbbsRepository.selectNttNo(boardVO.getBbsId(), boardVO.getSortOrdr()));
+
+                System.out.println("계산 후 LC 번호 >> " + boardVO.getReplyLc());
 
                 // 답글에 대한 nttId 생성 후 nttId에 set +++
                 long nttId = idgenServiceArticle.getNextLongId();
@@ -104,9 +111,6 @@ public class EgovArticleServiceImpl implements EgovArticleService {
                 boardVO.setNtcrNm("테스트1");
                 boardVO.setNtcrId("USRCNFRM_00000000000");
 
-            }else{ // 답글 수정
-                boardVO.setLastUpdusrId("USRCNFRM_00000000000");
-                boardVO.setLastUpdtPnttm(LocalDateTime.now());
             }
 
         } else {
@@ -124,12 +128,15 @@ public class EgovArticleServiceImpl implements EgovArticleService {
                 boardVO.setNtcrNm("테스트1");
                 boardVO.setNtcrId("USRCNFRM_00000000000");
 
-            }else{
-                System.out.println("게시글 수정");
-                boardVO.setLastUpdusrId("USRCNFRM_00000000000");
             }
 
             boardVO.setSortOrdr(boardVO.getNttId());
+        }
+
+        if(boardVO.getFrstRegistPnttm() != null){
+            System.out.println("게시글 수정");
+            boardVO.setLastUpdusrId("USRCNFRM_00000000000");
+            boardVO.setLastUpdtPnttm(LocalDateTime.now());
         }
 
         /* 익명글 처리 */
@@ -138,9 +145,9 @@ public class EgovArticleServiceImpl implements EgovArticleService {
             boardVO.setNtcrNm("익명");
         }
 
-        System.out.println(boardVO.getParnts());
-        Comtnbbs comtnbbs = AppUtils.bbsVOToEntity(boardVO);
-        System.out.println(comtnbbs.getParntscttNo());
+        //더미데이터
+        boardVO.setNtcrNm("테스트1");
+        boardVO.setNtcrId("USRCNFRM_00000000000");
 
         comtnbbsRepository.save(AppUtils.bbsVOToEntity(boardVO));
     }

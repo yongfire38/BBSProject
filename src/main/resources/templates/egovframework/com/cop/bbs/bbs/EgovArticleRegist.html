@@ -133,11 +133,13 @@
     var answerAt = /*[[${boardVO.replyAt}]]*/;
     var frstRegistPnttm;
     var answerLc = 0;
+    var sortOrdr = /*[[${boardVO.sortOrdr}]]*/;
+    var nttNo = 1;
     let editorData = "";
     let rdCnt = 0;
     let atchFileId = "";
-    let sortOrdr = 0;
     let deleteFileSn = [];
+
 
     /*********************************************************
      * 게시판 상세 정보 및 게시판별 설정
@@ -306,21 +308,21 @@
 import {editorConfig} from "../../../../../../../js/ckEditor_simple-main.js";
 import {ClassicEditor} from "../../../../../../ckeditor5_simple/ckeditor5.js";
 
+
 ClassicEditor.create(document.querySelector('#editor'), editorConfig)
     .then(editor => {
         if(nttId != 0 || parnt != 0){
+            //답글 (수정 x)
             console.log("부모글 > " + parnt);
             console.log("게시글 > " + nttId);
-            if(parnt != 0){
-                nttId = parnt;
-            }
             $.ajax({
                 url: '/cop/bbs/bbs/selectArticleDetail',
                 method: 'GET',
                 data: { bbsId: bbsId, nttId: nttId },
                 success: function(result){
                     console.log(result);
-                    if(parnt == 0){
+                    if(nttId != 0){
+                        // 수정
                         console.log("수정");
                         $("#nttSj").val(result.nttSj);
                         editor.setData(result.nttCn);
@@ -352,21 +354,22 @@ ClassicEditor.create(document.querySelector('#editor'), editorConfig)
                                 }
                             })
                         }
-                    }
-
-                    if(parnt != 0){
-                        rdCnt = 0;
-                    }else{
+                        sortOrdr = result.sortOrdr;
+                        frstRegistPnttm = result.frstRegistPnttm;
                         rdCnt = result.rdcnt;
+                        nttNo = result.nttNo;
+                    }else{
+                        rdCnt = 0;
                     }
-                    sortOrdr = result.sortOrdr;
-                    frstRegistPnttm = result.frstRegistPnttm;
-                    answerAt = result.replyPosblAt;
-                    // parnt = parnts;
-                    answerLc = result.answerLc;
+                    if(parnt == 0){
+                        answerAt = "N";
+                    }else{
+                        answerAt = result.replyPosblAt;
+                        answerLc = result.answerLc;
+                        parnt=result.parntscttNo;
+                    }
                 }
             });
-
         }
         $("#insertBtn").click(function(){
             editorData = editor.getData();
@@ -422,20 +425,22 @@ function fn_egov_regist_bbs(editorData) {
         ntceEndde: $('input[name="ntceEndde"]').val(),
         bbsId: /*[[${bbsId}]]*/,
         nttId: /*[[${nttId}]]*/,
-        nttNo: 1,
+        nttNo: nttNo,
         useAt:"Y",
         inqireCo:rdCnt,
         atchFileId: atchFileId,
         sortOrdr:sortOrdr,
         replyAt:answerAt,
         parnts:parnt,
-        replyLc:answerLc
+        replyLc:answerLc,
+        // frstRegistPnttm: frstRegistPnttm
     };
-    console.log(data);
 
-    // if(frstRegistPnttm != null){
-    //     data.frstRegistPnttm = frstRegistPnttm;
-    // }
+    if(frstRegistPnttm != null){
+        data.frstRegistPnttm = frstRegistPnttm;
+    }
+
+    console.log(data);
 
     const delData= {
         atchFileId: atchFileId,

@@ -1,11 +1,11 @@
 package egovframework.com.cop.bbs.bbs.web;
 
-import egovframework.com.cop.bbs.bbs.service.Board;
-import egovframework.com.cop.bbs.bbs.service.BoardVO;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import egovframework.com.cop.bbs.bbs.service.BoardVO;
 
 @Controller
 public class EgovArticleController {
@@ -38,9 +38,11 @@ public class EgovArticleController {
 
         // 답글
         if(boardVO.getReplyAt().equals("Y")){
-            System.out.println("답글 >>> " + boardVO.getReplyAt());
             model.addAttribute("answerAt",boardVO.getReplyAt());
             model.addAttribute("parnts",boardVO.getParnts());
+            if(boardVO.getSortOrdr() != 0){
+                model.addAttribute("sortOrdr",boardVO.getSortOrdr());
+            }
         }
         return "egovframework/com/cop/bbs/bbs/EgovArticleRegist";
     }
