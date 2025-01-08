@@ -107,7 +107,8 @@ public class EgovArticleServiceImpl implements EgovArticleService {
     @Override
     public void insertArticle(BoardVO boardVO) throws Exception{
     	
-    	long nttId = idgenServiceArticle.getNextLongId();
+    	long oldNttId = boardVO.getNttId();
+    	long newNttId = idgenServiceArticle.getNextLongId();
     	
     	try {
     		if ("Y".equals(boardVO.getReplyAt())) {
@@ -123,7 +124,7 @@ public class EgovArticleServiceImpl implements EgovArticleService {
 
                     // 답글에 대한 nttId 생성 후 nttId에 set +++
                     //long nttId = idgenServiceArticle.getNextLongId();
-                    boardVO.setNttId(nttId);
+                    boardVO.setNttId(newNttId);
                     boardVO.setFrstRegistPnttm(LocalDateTime.now());
 
                     //더미데이터
@@ -140,7 +141,7 @@ public class EgovArticleServiceImpl implements EgovArticleService {
 
                 if(boardVO.getNttId() == 0){
                     //long nttId = idgenServiceArticle.getNextLongId();
-                    boardVO.setNttId(nttId);
+                    boardVO.setNttId(newNttId);
                     boardVO.setFrstRegistPnttm(LocalDateTime.now());
 
                     //더미데이터
@@ -152,8 +153,9 @@ public class EgovArticleServiceImpl implements EgovArticleService {
                 boardVO.setSortOrdr(boardVO.getNttId());
             }
 
-            if(boardVO.getFrstRegistPnttm() != null){
+            if(oldNttId == newNttId){
                 System.out.println("게시글 수정");
+                boardVO.setNttId(oldNttId);
                 boardVO.setLastUpdusrId("USRCNFRM_00000000000");
                 boardVO.setLastUpdtPnttm(LocalDateTime.now());
             }
@@ -171,11 +173,19 @@ public class EgovArticleServiceImpl implements EgovArticleService {
             comtnbbsRepository.save(AppUtils.bbsVOToEntity(boardVO));
             
             // 이력관리 mySql 테이블에 코드 "N"으로 저장
-            insertToBbsManageInfo(nttId, boardVO.getBbsId(), "N");
+            if(boardVO.getNttId() == newNttId){	// 신규 게시글 작성의 경우
+                insertToBbsManageInfo(newNttId, boardVO.getBbsId(), "N");
+            } else { // 기존 게시글 수정의 경우
+                insertToBbsManageInfo(oldNttId, boardVO.getBbsId(), "N");
+            }
             
     	} catch (Exception e) {
     		// 예외 발생 시, 이력관리 mySql 테이블에 코드 "E"로 저장
-    		insertToBbsManageInfo(nttId, boardVO.getBbsId(), "E");
+    		if(boardVO.getNttId() == newNttId){
+                insertToBbsManageInfo(newNttId, boardVO.getBbsId(), "E");
+            } else {
+                insertToBbsManageInfo(oldNttId, boardVO.getBbsId(), "E");
+            }
     		log.error("Error occurred during insertion or indexing:", e);
     		throw e;
     	}

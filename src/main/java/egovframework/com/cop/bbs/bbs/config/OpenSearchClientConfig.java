@@ -1,6 +1,5 @@
 package egovframework.com.cop.bbs.bbs.config;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.security.KeyStore;
 

@@ -122,6 +122,7 @@ public class AsyncServiceImpl implements AsyncService {
 	}
 	
 	private void performOpenSearchTextOperation(Long nttId, BoardVO boardVO) throws IOException {
+
 		GetRequest getRequest = new GetRequest.Builder()
                 .index(textIndexName)
                 .id(Long.toString(nttId))
