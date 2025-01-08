@@ -32,7 +32,6 @@ import egovframework.com.cop.bbs.bbs.repository.ComtnbbsmanageRepository;
 import egovframework.com.cop.bbs.bbs.service.AsyncService;
 import egovframework.com.cop.bbs.bbs.service.BoardEmbeddingVO;
 import egovframework.com.cop.bbs.bbs.service.BoardVO;
-import egovframework.com.cop.bbs.bbs.service.EgovBbsInfoManageUtility;
 import egovframework.com.utl.fcc.service.EgovStringUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -84,7 +83,11 @@ public class AsyncServiceImpl implements AsyncService {
 	private void processGroupOfRecords(Long nttId, String bbsId, List<Comtnbbsmanage> records) {
 		try {
 			BoardVO boardVO = comtnbbsRepository.findByComtnbbsIdNttId(nttId)
-					.map(EgovBbsInfoManageUtility::entityToVO)
+					.map(dto -> {
+						BoardVO vo = new BoardVO();
+						BeanUtils.copyProperties(dto, vo);
+						return vo;
+					})
 					.orElse(null);
 			
 			if (boardVO == null) {

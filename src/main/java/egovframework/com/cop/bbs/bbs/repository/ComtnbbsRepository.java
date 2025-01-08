@@ -78,7 +78,17 @@ public interface ComtnbbsRepository extends JpaRepository<Comtnbbs, ComtnbbsId> 
     List<BBSDTO>selectAllArticle();
     
     //NTT_ID에 해당하는 데이터를 가져오는 메서드
-    Optional<Comtnbbs> findByComtnbbsIdNttId(Long nttId);
+    @Query("SELECT new egovframework.com.cop.bbs.bbs.service.BBSDTO(" +
+            "a.nttSj, a.ntcrId, a.ntcrNm, a.nttNo, a.nttCn, a.password, a.frstRegisterId, " +
+            "COALESCE(b.userNm, a.ntcrNm), a.frstRegistPnttm, a.ntceBgnde, a.ntceEndde, a.rdcnt, " +
+            "a.useAt, a.atchFileId, a.comtnbbsId.bbsId, a.comtnbbsId.nttId, a.sjBoldAt, a.noticeAt, " +
+            "a.secretAt, a.parntscttNo, a.answerAt, a.answerLc, a.sortOrdr, " +
+            "c.bbsTyCode, c.replyPosblAt, c.fileAtchPosblAt, c.atchPosblFileNumber, c.bbsNm) " +
+            "FROM Comtnbbs a " +
+            "LEFT JOIN Comvnusermaster b ON a.frstRegisterId = b.esntlId " +
+            "LEFT JOIN a.comtnbbsmaster c " +
+            "WHERE a.comtnbbsId.nttId = :nttId")
+     Optional<BBSDTO> findByComtnbbsIdNttId(@Param("nttId") Long nttId);
     
     @Query("SELECT IFNULL(MAX(c.sortOrdr),0)+1 AS nttNo FROM Comtnbbs c WHERE c.comtnbbsId.bbsId = :bbsId")
     int selectSortOrder(@Param("bbsId") String bbsId);
