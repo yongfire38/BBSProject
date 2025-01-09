@@ -1,8 +1,6 @@
 package egovframework.com.cop.bbs.bbs.service.impl;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -19,15 +17,16 @@ import org.springframework.stereotype.Service;
 
 import egovframework.com.cop.bbs.bbs.entity.Comtnbbs;
 import egovframework.com.cop.bbs.bbs.entity.ComtnbbsId;
-import egovframework.com.cop.bbs.bbs.entity.Comtnbbsmanage;
 import egovframework.com.cop.bbs.bbs.entity.Comtncomment;
+import egovframework.com.cop.bbs.bbs.event.BoardEvent;
+import egovframework.com.cop.bbs.bbs.event.BoardEventType;
 import egovframework.com.cop.bbs.bbs.repository.ComtnbbsRepository;
-import egovframework.com.cop.bbs.bbs.repository.ComtnbbsmanageRepository;
 import egovframework.com.cop.bbs.bbs.repository.ComtnbbsmasteroptnRepository;
 import egovframework.com.cop.bbs.bbs.repository.ComtncommentRepository;
 import egovframework.com.cop.bbs.bbs.service.BBSDTO;
 import egovframework.com.cop.bbs.bbs.service.BBSListDTO;
 import egovframework.com.cop.bbs.bbs.service.Board;
+import egovframework.com.cop.bbs.bbs.service.BoardEventPublisher;
 import egovframework.com.cop.bbs.bbs.service.BoardMaster;
 import egovframework.com.cop.bbs.bbs.service.BoardMasterVO;
 import egovframework.com.cop.bbs.bbs.service.BoardVO;
@@ -42,23 +41,20 @@ public class EgovArticleServiceImpl implements EgovArticleService {
     private final ComtnbbsRepository comtnbbsRepository;
     private final ComtncommentRepository comtncommentRepository;
     private final ComtnbbsmasteroptnRepository comtnbbsmasteroptnRepository;
-    private final ComtnbbsmanageRepository comtnbbsmanageRepository;
+    private final BoardEventPublisher boardEventPublisher;
 
     @Qualifier("egovArticleIdGnrService")
     private final EgovIdGnrService idgenServiceArticle;
-    
-    @Qualifier("egovSyncIdGnrService")
-    private final EgovIdGnrService idgenServiceManager;
 
-    public EgovArticleServiceImpl(ComtnbbsRepository comtnbbsRepository, ComtncommentRepository comtncommentRepository, ComtnbbsmasteroptnRepository comtnbbsmasteroptnRepository, ComtnbbsmanageRepository comtnbbsmanageRepository, 
-    		@Qualifier("egovArticleIdGnrService") EgovIdGnrService idgenServiceArticle, @Qualifier("egovSyncIdGnrService") EgovIdGnrService idgenServiceManager
+    public EgovArticleServiceImpl(ComtnbbsRepository comtnbbsRepository, ComtncommentRepository comtncommentRepository, ComtnbbsmasteroptnRepository comtnbbsmasteroptnRepository, 
+    		BoardEventPublisher boardEventPublisher,
+    		@Qualifier("egovArticleIdGnrService") EgovIdGnrService idgenServiceArticle
     		) {
         this.comtnbbsRepository = comtnbbsRepository;
         this.comtncommentRepository = comtncommentRepository;
         this.comtnbbsmasteroptnRepository = comtnbbsmasteroptnRepository;
-		this.comtnbbsmanageRepository = comtnbbsmanageRepository;
+		this.boardEventPublisher = boardEventPublisher;
         this.idgenServiceArticle = idgenServiceArticle;
-		this.idgenServiceManager = idgenServiceManager;
     }
 
     @Override
@@ -172,20 +168,28 @@ public class EgovArticleServiceImpl implements EgovArticleService {
 
             comtnbbsRepository.save(AppUtils.bbsVOToEntity(boardVO));
             
+            // 게시글 저장 후 이벤트 발행
+            BoardEvent event = BoardEvent.builder()
+                    .eventType(BoardEventType.CREATE)
+                    .nttId(boardVO.getNttId())
+                    .bbsId(boardVO.getBbsId())
+                    .nttSj(boardVO.getNttSj())
+                    .nttCn(boardVO.getNttCn())
+                    .eventDateTime(new Date())
+                    .build();
+            
+            boardEventPublisher.publishBoardEvent(event);
+            
             // 이력관리 mySql 테이블에 코드 "N"으로 저장
+            /*
             if(boardVO.getNttId() == newNttId){	// 신규 게시글 작성의 경우
                 insertToBbsManageInfo(newNttId, boardVO.getBbsId(), "N");
             } else { // 기존 게시글 수정의 경우
                 insertToBbsManageInfo(oldNttId, boardVO.getBbsId(), "N");
             }
+            */
             
     	} catch (Exception e) {
-    		// 예외 발생 시, 이력관리 mySql 테이블에 코드 "E"로 저장
-    		if(boardVO.getNttId() == newNttId){
-                insertToBbsManageInfo(newNttId, boardVO.getBbsId(), "E");
-            } else {
-                insertToBbsManageInfo(oldNttId, boardVO.getBbsId(), "E");
-            }
     		log.error("Error occurred during insertion or indexing:", e);
     		throw e;
     	}
@@ -251,24 +255,5 @@ public class EgovArticleServiceImpl implements EgovArticleService {
                 comtncommentRepository.save(comment);
             }
         }
-    }
-    
-    private void insertToBbsManageInfo(Long nttId, String bbsId, String syncSttusCode) throws Exception {
-    	Comtnbbsmanage comtnbbsmanage = new Comtnbbsmanage();
-    	ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
-		Date localDate = Date.from(now.toInstant());
-		
-		String syncId = idgenServiceManager.getNextStringId();
-		comtnbbsmanage.setSyncId(syncId);
-		comtnbbsmanage.setNttId(nttId);
-		comtnbbsmanage.setBbsId(bbsId);
-		comtnbbsmanage.setSyncSttusCode(syncSttusCode);
-		comtnbbsmanage.setRegistPnttm(localDate);
-		
-		if(syncSttusCode.equals("E")) {
-			comtnbbsmanage.setErrorPnttm(localDate);
-		}
-		
-		AppUtils.bbsManageEntityToVO(comtnbbsmanageRepository.save(comtnbbsmanage));
     }
 }
