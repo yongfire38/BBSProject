@@ -10,6 +10,7 @@ import javax.transaction.Transactional;
 
 import org.egovframe.rte.fdl.idgnr.EgovIdGnrService;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +27,6 @@ import egovframework.com.cop.bbs.bbs.repository.ComtncommentRepository;
 import egovframework.com.cop.bbs.bbs.service.BBSDTO;
 import egovframework.com.cop.bbs.bbs.service.BBSListDTO;
 import egovframework.com.cop.bbs.bbs.service.Board;
-import egovframework.com.cop.bbs.bbs.service.BoardEventPublisher;
 import egovframework.com.cop.bbs.bbs.service.BoardMaster;
 import egovframework.com.cop.bbs.bbs.service.BoardMasterVO;
 import egovframework.com.cop.bbs.bbs.service.BoardVO;
@@ -41,19 +41,19 @@ public class EgovArticleServiceImpl implements EgovArticleService {
     private final ComtnbbsRepository comtnbbsRepository;
     private final ComtncommentRepository comtncommentRepository;
     private final ComtnbbsmasteroptnRepository comtnbbsmasteroptnRepository;
-    private final BoardEventPublisher boardEventPublisher;
+    private final StreamBridge streamBridge;
 
     @Qualifier("egovArticleIdGnrService")
     private final EgovIdGnrService idgenServiceArticle;
 
     public EgovArticleServiceImpl(ComtnbbsRepository comtnbbsRepository, ComtncommentRepository comtncommentRepository, ComtnbbsmasteroptnRepository comtnbbsmasteroptnRepository, 
-    		BoardEventPublisher boardEventPublisher,
+    		StreamBridge streamBridge,
     		@Qualifier("egovArticleIdGnrService") EgovIdGnrService idgenServiceArticle
     		) {
         this.comtnbbsRepository = comtnbbsRepository;
         this.comtncommentRepository = comtncommentRepository;
         this.comtnbbsmasteroptnRepository = comtnbbsmasteroptnRepository;
-		this.boardEventPublisher = boardEventPublisher;
+		this.streamBridge = streamBridge;
         this.idgenServiceArticle = idgenServiceArticle;
     }
 
@@ -178,16 +178,7 @@ public class EgovArticleServiceImpl implements EgovArticleService {
                     .eventDateTime(new Date())
                     .build();
             
-            boardEventPublisher.publishBoardEvent(event);
-            
-            // 이력관리 mySql 테이블에 코드 "N"으로 저장
-            /*
-            if(boardVO.getNttId() == newNttId){	// 신규 게시글 작성의 경우
-                insertToBbsManageInfo(newNttId, boardVO.getBbsId(), "N");
-            } else { // 기존 게시글 수정의 경우
-                insertToBbsManageInfo(oldNttId, boardVO.getBbsId(), "N");
-            }
-            */
+            streamBridge.send("basicProducer-out-0", event);
             
     	} catch (Exception e) {
     		log.error("Error occurred during insertion or indexing:", e);
