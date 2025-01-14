@@ -1,0 +1,53 @@
+/* main Layout */
+#container{
+    display: flex;
+    flex-direction: column;
+    gap: var(--krds-gap-6);
+    margin: 0 auto;
+    width: 80%;
+}
+.inner{
+    display: flex;
+    justify-content: center;
+    gap:var(--krds-gap-10);
+    max-width: 70%;
+    height:100%;
+    margin: 0 auto;
+}
+.contents{
+    padding : var(--krds-padding-8) 0;
+    width: 100%;
+    min-height:70rem;
+}
+.box-cnt{
+    padding: 2rem;
+    border: 1px solid;
+}
+.box-sec{
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* search */
+.sch-input{
+    width:100%;
+    align-items: center;
+    gap: var(--krds-number-6);
+}
+
+.card-top .krds-badge-wrap{
+    justify-content: space-between;
+    width: 100%;
+}
+.sch-form-wrap .form-select{
+    min-width: 20rem;
+}
+
+/* btn */
+.btn-wrap{
+    text-align: center;
+}
+.input-group .form-check{
+    width:100%;
+}

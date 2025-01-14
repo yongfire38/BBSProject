@@ -3,43 +3,38 @@
 <head th:with="pageTitle=#{comCopBbs.articleVO.title}">
     <meta charset="UTF-8">
     <title th:text="${pageTitle} + ' ' + #{title.list}"></title><!--게시글 목록-->
-    <link th:href="@{/css/pattern_css.css}" type="text/css" rel="stylesheet">
-    <script src="/js/jquery-3.7.1.min.js"></script>
+<!--    <link th:href="@{/css/pattern_css.css}" type="text/css" rel="stylesheet">-->
+<!--    <script src="/js/jquery-3.7.1.min.js"></script>-->
+    <div th:replace="egovframework/com/cop/bbs/bbs/fragement/linkFragment"></div>
 </head>
 <body th:with="pageTitle=#{comCopBbs.articleVO.title}">
 <!-- javascript warning tag  -->
 <noscript class="noScriptTitle" th:text="#{common.noScriptTitle.msg}"></noscript>
-<div>
+<div id="container">
     <h1 id="bbsTitle" th:text="${pageTitle} + ' ' + #{title.list} + ' - '"></h1><!--게시글 목록-->
     <!--하단 버튼-->
     <!-- 검색 입력폼 -->
     <div class="search-top-box" th:title="#{common.searchCondition.msg}">
         <div class="sch-form-wrap">
-            <select class="form-select" name="searchCnd" id="searchCnd" th:title="#{title.searchCondition} + ' ' + #{input.cSelect}">
-                <option value="0" th:selected="${searchCnd == '0'}">
-                    <span th:text="#{comCopBbs.articleVO.list.nttSj}"></span>
-                </option>
-                <option value="1" th:selected="${searchCnd == '1'}">
-                    <span th:text="#{comCopBbs.articleVO.list.nttCn}"></span>
-                </option>
-                <option value="1" th:selected="${searchCnd == '2'}">
-                    <span th:text="#{table.reger}"></span>
-                </option>
-            </select>
+            <div class="form-conts">
+                <select class="form-select" name="searchCnd" id="searchCnd" th:title="#{title.searchCondition} + ' ' + #{input.cSelect}">
+                    <option value="0" th:selected="${searchCnd == '0'}" th:text="#{comCopBbs.articleVO.list.nttSj}"></option>
+                    <option value="1" th:selected="${searchCnd == '1'}" th:text="#{comCopBbs.articleVO.list.nttCn}"></option>
+                    <option value="1" th:selected="${searchCnd == '2'}" th:text="#{table.reger}"></option>
+                </select>
+            </div>
             <div class="sch-input">
                 <input type="text" class="form-control" placeholder="검색어를 입력해주세요" name="searchWrd" id="searchWrd" th:title="#{title.search} + ' ' + #{input.input}">
-                <button type="button" class="btn btn-ico ico-sch" onclick="fn_egov_search_article(bbsId, 1)" th:title="#{title.inquire} + ' ' + #{input.button}">
+                <button type="button" class="krds-btn svg-icon ico-sch" onclick="fn_egov_search_article(bbsId, 1)" th:title="#{title.inquire} + ' ' + #{input.button}">
                     <span class="sr-only" th:text="#{button.inquire}"></span>
                 </button>
             </div>
-<!--            <button type="button" class="btn" onclick="window.location.href = '/cop/bbs/bbs/insertArticleView';" th:text="#{button.create}" th:title="#{button.create} + ' ' + #{input.button}"></button>-->
-            <button type="button" class="btn" th:onclick="|location.href='@{/cop/bbs/bbs/insertArticleView(bbsId=${bbsId})}'|" th:text="#{button.create}" th:title="#{button.create} + ' ' + #{input.button}"></button>
+            <button type="button" class="krds-btn" th:onclick="|location.href='@{/cop/bbs/bbs/insertArticleView(bbsId=${bbsId})}'|" th:text="#{button.create}" th:title="#{button.create} + ' ' + #{input.button}"></button>
         </div>
     </div>
     <!-- //검색 입력폼 -->
 
     <!-- 검색 결과 : 리스트 -->
-<!--    <ul class="search-list type1" id="articleList" th:title="#{common.summary.list(${pageTitle})}"></ul>-->
     <div class="tbl-wrap">
         <table class="tbl col data">
             <caption>게시글 목록</caption>
@@ -64,15 +59,18 @@
         </table>
     </div>
 
-    <!-- //검색 결과 : 리스트 -->
-
     <!-- paging : 웹 -->
     <div class="pagination w-page" id="pagination">
         <div class="page-links">
             <a class="page-link active" href="#">1</a>
         </div>
     </div>
+
+    <div class="btn-wrap">
+        <button type="button" class="krds-btn medium tertiary" onclick="location.href='/cop/bbs/bbs/selectBBSMasterInfsView'" th:title="#{title.list}" th:text="#{title.list}"></button>
+    </div>
 </div>
+
 
 <script th:inline="javascript">
     var bbsId = /*[[${bbsId}]]*/;       // 서버에서 전달된 bbsId 값을 사용
@@ -170,62 +168,19 @@
                                     <td ${article.sjBoldAt === "Y" ? "style='font-weight:bold;'":""}>
                                     ${article.answerAt === "Y"?
                                         Array(article.answerLc).fill("&nbsp&nbsp&nbsp&nbsp").join(' ') + "<span style=\"display: inline-block; width: 20px; height: 20px; background: url('/img/egovframe/icon_reply.png') no-repeat center center;\"></span>" : ""}
+                                    ${article.secretAt === "Y"?
+                                        // 로그인 유저 == 게시글 등록자 이면 열린 자물쇠로 이미지 변경하거나 자물쇠 아이콘 삭제 //
+                                        "<span style=\"display: inline-block; width: 20px; height: 20px; background: url('/img/egovframe/icon_secret.svg') no-repeat center center;\"></span>" : ""}
                                     ${article.nttSj}
                                     </td>
                                     <td>${article.frstRegistPnttm}</td>
                                     <td>${article.ntcrNm}</td>
                                     <td>${article.rdcnt}</td>
                                 </tr>`;
-                // const listItem = `<li class="li">
-                //         <div class="in">
-                //             <div class="card-top">
-                //                 <span title="${messages['table.num']}">${totalElements - ((response.number * response.size) + index)}</span>
-                //                 <div class="btn-area">
-                //                     <button type="button" class="sm">${messages['table.reger']} : </button>
-                //                     <button type="button" class="sm">${article.frstRegisterNm}</button>
-                //                 </div>
-                //             </div>
-                //             <div class="card-body">
-                //                 <a href="/cop/bbs/bbs/selectArticleDetailView?bbsId=${bbsId}&nttId=${article.nttId}&pageNum=${pageIndex}" class="c-text">
-                //                     <p class="c-tit"><span class="span">${article.nttSj}</span></p>
-                //                     <p class="c-date">
-                //                         <strong class="key">${messages['table.regdate']}</strong>
-                //                         <span class="value">${article.frstRegistPnttm}</span>
-                //                     </p>
-                //                 </a>
-                //             </div>
-                //             <div class="card-btm">
-                //                 <span title="${messages['comCopBbs.articleVO.detail.inqireCo']}">${article.rdcnt}</span>
-                //             </div>
-                //         </div>
-                //     </li>`;
                 articleList.append(listItem);
             });
         } else {
             const listItem = '<tr><td colspan="5">데이터 없음</td></tr>'
-            // const listItem = `<li class="li">
-            //         <div class="in">
-            //             <div class="card-top">
-            //                 <span  title="${messages['table.num']}">1</span>
-            //                 <div class="btn-area">
-            //                     <button type="button" class="sm">${messages['table.reger']} : </button>
-            //                     <button type="button" class="sm">데이터 없음</button>
-            //                 </div>
-            //             </div>
-            //             <div class="card-body">
-            //                 <a href="#" class="c-text">
-            //                     <p class="c-tit"><span class="span">${messages['common.nodata.msg']}</span></p>
-            //                     <p class="c-date">
-            //                         <strong class="key">${messages['table.regdate']}</strong>
-            //                         <span class="value">데이터 없음</span>
-            //                     </p>
-            //                 </a>
-            //             </div>
-            //             <div class="card-btm">
-            //                 <span title="${messages['comCopBbs.articleVO.detail.inqireCo']}">데이터 없음</span>
-            //             </div>
-            //         </div>
-            //     </li>`;
             articleList.append(listItem);
         }
     }

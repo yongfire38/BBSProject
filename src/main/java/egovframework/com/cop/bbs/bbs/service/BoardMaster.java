@@ -66,7 +66,7 @@ public class BoardMaster implements Serializable {
     /** 첨부가능파일사이즈 */
     private String atchPosblFileSize = "";
     
-    /** 답장가능여부 */
+    /** 답글가능여부 */
     @EgovNullCheck(message = "{comCopBbs.boardMasterVO.regist.replyPosblAt}{common.required.msg}")
     private String replyPosblAt = "";
     

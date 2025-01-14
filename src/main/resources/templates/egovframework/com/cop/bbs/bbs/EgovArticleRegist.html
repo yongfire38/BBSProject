@@ -3,7 +3,8 @@
 <head th:with="pageTitle=#{comCopBbs.articleVO.title}">
     <meta charset="UTF-8">
     <title th:text="${pageTitle} + ' ' + #{title.create}"></title>
-    <link th:href="@{/css/pattern_css.css}" type="text/css" rel="stylesheet">
+<!--    <link th:href="@{/css/pattern_css.css}" type="text/css" rel="stylesheet">-->
+    <div th:replace="egovframework/com/cop/bbs/bbs/fragement/linkFragment"></div>
     <link rel="stylesheet" th:href="@{/ckeditor5_simple/ckeditor5.css}">
     <link rel="stylesheet" th:href="@{/css/ckEditor_simple-main.css}">
     <style>
@@ -12,7 +13,7 @@
         }
         .form-checks-inline .form-wrap{
             justify-items: center;
-            gap: var(--krds-spacer-2);
+            gap: var(--krds-number-4);
         }
         .textarea-wrap .ck-content{
             height:300px;
@@ -23,24 +24,40 @@
 <body th:with="pageTitle=#{comCopBbs.articleVO.title}">
 <!-- javascript warning tag  -->
 <noscript class="noScriptTitle" th:text="#{common.noScriptTitle.msg}"></noscript>
-    <div>
+    <div id="container">
         <h1 th:text="${pageTitle} + ' ' + #{title.create}"></h1><!--게시글 등록-->
         <!-- 게시글 등록 입력폼 -->
         <div class="txt-box bg-white" th:title="#{common.summary.regist(${pageTitle})}">
             <div class="box-cnt">
                 <div class="box-sec">
-                    <div class="form-group"><!--글 제목-->
-                        <div class="form-tit" th:text="#{comCopBbs.articleVO.regist.nttSj}"></div>
-                        <div class="form-conts">
-                            <input type="text" name="nttSj" id="nttSj" class="form-control" placeholder="입력하세요" th:title="#{comCopBbs.articleVO.regist.nttSj} + ' ' + #{input.input}">
-                            <span id="nttSjError" style="color:red"></span>
+                    <!--공지신청 여부-->
+                    <div class="chk-area">
+                        <div class="form-chip">
+                            <input type="checkbox" class="checkbox" name="noticeAt" id="noticeAt" th:title="#{comCopBbs.articleVO.regist.noticeAt}">
+                            <label class="form-chip-outline" for="noticeAt" th:text="#{comCopBbs.articleVO.regist.noticeAt}"></label>
+                        </div>
+                        <!--비밀글 여부-->
+                        <div class="form-chip">
+                            <input type="checkbox" class="checkbox" name="secretAt" id="secretAt" th:title="#{comCopBbs.articleVO.regist.secretAt}">
+                            <label class="form-chip-outline" for="secretAt" th:text="#{comCopBbs.articleVO.regist.secretAt}"></label>
+                        </div>
+                        <!--익명등록 여부-->
+                        <div class="form-chip">
+                            <input type="checkbox" class="checkbox" name="anonymousAt" id="anonymousAt" th:title="#{comCopBbs.articleVO.regist.anonymousAt}">
+                            <label class="form-chip-outline" for="anonymousAt" th:text="#{comCopBbs.articleVO.regist.anonymousAt}"></label>
                         </div>
                     </div>
-                    <div class="form-group"><!--제목 Bold 여부-->
-                        <div class="form-check sm">
-                            <input type="checkbox" name="sjBoldAt" id="sjBoldAt" class="form-control" th:title="#{comCopBbs.articleVO.regist.sjBoldAt}">
-                            <label for="sjBoldAt" th:text="#{comCopBbs.articleVO.regist.sjBoldAt}"></label>
+                    <div class="form-group"><!--글 제목-->
+                        <div class="form-tit" th:text="#{comCopBbs.articleVO.regist.nttSj}"></div>
+                        <div class="input-group">
+                            <input type="text" name="nttSj" id="nttSj" class="form-control" placeholder="입력하세요" th:title="#{comCopBbs.articleVO.regist.nttSj} + ' ' + #{input.input}">
+                            <span id="nttSjError" style="color:red"></span>
+                            <div class="form-check">
+                                <input type="checkbox" id="sjBoldAt"  name="sjBoldAt" th:title="#{comCopBbs.articleVO.regist.sjBoldAt}">
+                                <label for="sjBoldAt" th:text="#{comCopBbs.articleVO.regist.sjBoldAt}"></label>
+                            </div>
                         </div>
+
                     </div>
                     <div class="form-group"><!--글 내용-->
                         <div class="form-tit" th:text="#{comCopBbs.articleVO.regist.nttCn}"></div>
@@ -54,74 +71,49 @@
                         </div>
                     </div>
                     <!--유효기간 설정-->
-                    <div class="form-group">
-<!--                        <div class="form-tit" th:text="#{comCopBbs.articleVO.regist.ntceDe}"></div>-->
-                        <div class="form-conts datepicker-conts" style="flex-direction: row; justify-content: space-between;">
-                            <div class="datepicker-input" style="width: 45%">
-<!--                                <label for="startDate">시작 날짜</label>-->
+                    <div class="input-group">
+                        <div class="form-group">
+                            <div class="form-tit">시작 날짜</div>
+                            <div class="datepicker-input">
                                 <input type="date" class="form-control datepicker cal" name="ntceBgnde" id="startDate" style="padding-right:1rem">
                                 <span id="ntceBgndeError" style="color:red"></span>
                             </div>
-                            <span style="margin:auto 0;"> ~ </span>
-                            <div class="datepicker-input" style="width: 45%">
-<!--                                <label for="endDate">종료 날짜</label>-->
+                        </div>
+                        <div class="form-group">
+                            <div class="form-tit">종료 날짜</div>
+                            <div class="datepicker-input">
                                 <input type="date" class="form-control datepicker cal" name="ntceEndde" id="endDate" style="padding-right:1rem">
                                 <span id="ntceEnddeError" style="color:red"></span>
                             </div>
                         </div>
                     </div>
+
                     <!--첨부파일-->
-                    <div class="form-group" id="fileAtchFrm">
+                    <div class="krds-file-upload" id="fileAtchFrm">
                         <div class="form-tit" th:text="#{comCopBbs.articleVO.regist.atchFile}"></div>
-                        <div class="file-upload" style="padding: var(--krds-spacer-10); gap: var(--krds-spacer-5);">
-                            <input type="file" name="atchFile" id="fileUpload" class="sr-only" multiple="multiple">
+                        <div class="file-upload">
                             <p class="txt">첨부할 파일을 여기에 끌어다 놓거나,</br> 파일 선택 버튼을 눌러 파일을 직접 선택해주세요.</p>
-                            <label for="fileUpload" class="btn primary ico-before ico-upload md" th:text="#{input.cSelect}"></label>
+                            <div class="file-upload-btn-wrap">
+                                <input type="file" name="atchFile" id="fileUpload" class="sr-only" multiple="multiple">
+                                <label for="fileUpload">
+                                    <button type="button" class="krds-btn medium" th:text="#{input.cSelect}"><i class="svg-icon ico-upload"></i></button>
+                                </label>
+                            </div>
                         </div>
-                        <div class="file-upload-result" style="display: none">
-                            <div class="upload-top"></div>
+                        <div class="file-list" style="display: none">
+                            <div class="total"></div>
                             <ul class="upload-list" id="upload-list"></ul>
                         </div>
                         <span id="atchFileError" style="color:red"></span>
                     </div>
                 </div>
             </div>
-            <!-- 체크박스 그룹 -->
-            <div class="form-checks-inline">
-                <div class="form-wrap"><!--공지신청 여부-->
-                    <div class="form-tit" th:text="#{comCopBbs.articleVO.regist.noticeAt}"></div>
-                    <div class="form-switch">
-                        <input type="checkbox" name="noticeAt" id="noticeAt" th:title="#{comCopBbs.articleVO.regist.noticeAt}">
-                        <i></i>
-                        <label for="noticeAt"></label>
-                    </div>
-                </div>
-                <div class="form-wrap"><!--비밀글 여부-->
-                    <div class="form-tit" th:text="#{comCopBbs.articleVO.regist.secretAt}"></div>
-                    <div class="form-switch">
-                        <input type="checkbox" name="secretAt" id="secretAt" th:title="#{comCopBbs.articleVO.regist.secretAt}">
-                        <i></i>
-                        <label for="secretAt"></label>
-                    </div>
-                </div>
-                <div class="form-wrap"><!--익명등록 여부-->
-                    <div class="form-tit" th:text="#{comCopBbs.articleVO.regist.anonymousAt}"></div>
-                    <div class="form-switch">
-                        <input type="checkbox" name="anonymousAt" id="anonymousAt" th:title="#{comCopBbs.articleVO.regist.anonymousAt}">
-                        <i></i>
-                        <label for="anonymousAt"></label>
-                    </div>
-                </div>
-            </div>
+
             <!-- //게시판 등록 입력폼 -->
         </div>
-        <div class="page-btn-wrap both">
-            <button type="button" class="btn xlg tertiary" onclick="window.history.back();" th:text="#{button.list}" th:title="#{button.list} + ' ' + #{input.button}"></button>
-
-            <div class="btn-wrap">
-<!--                <button type="button" class="btn xlg" onclick="fn_egov_regist_bbs()" th:text="#{button.create}" th:title="#{button.create} + ' ' + #{input.button}"></button>-->
-                <button type="button" class="btn xlg" id="insertBtn" th:text="#{button.create}" th:title="#{button.create} + ' ' + #{input.button}"></button>
-            </div>
+        <div class="page-btn-wrap chip-wrap">
+            <button type="button" class="krds-btn large tertiary" onclick="window.history.back();" th:text="#{button.list}" th:title="#{button.list} + ' ' + #{input.button}"></button>
+            <button type="button" class="krds-btn large" id="insertBtn" th:text="#{button.create}" th:title="#{button.create} + ' ' + #{input.button}"></button>
         </div>
     </div>
 
@@ -133,30 +125,28 @@
     var answerAt = /*[[${boardVO.replyAt}]]*/;
     var frstRegistPnttm;
     var answerLc = 0;
+    var sortOrdr = /*[[${boardVO.sortOrdr}]]*/;
+    var nttNo = 1;
     let editorData = "";
     let rdCnt = 0;
     let atchFileId = "";
-    let sortOrdr = 0;
     let deleteFileSn = [];
+
 
     /*********************************************************
      * 게시판 상세 정보 및 게시판별 설정
      ******************************************************** */
+    console.log(bbsId);
     $.ajax({
         url:"/cop/bbs/bbs/selectBBSMasterDetail",
         method:"get",
         data: { bbsId: bbsId },
         success:function(result){
-            var html = "<div class='file-total'><span class='current'>0</span>"+"개 / "+"<span class='total-size'>"+result.atchPosblFileNumber+"</span>"+"개</div>"
-            $(".upload-top").append(html);
-            if(result.bbsTyCode === "BBST01"){          // 일반게시판
-
-            }else if(result.bbsTyCode === "BBST02"){    // 익명게시판
-
-            }else if(result.bbsTyCode === "BBST03"){    // 공지게시판
-
-            }else{                                      // 방명록
-                $("#fileAtchFrm").hide();
+            var html = "<span class='current'>0</span>"+"개 / "+"<span class='total-size'>"+result.atchPosblFileNumber+"</span>"+"개"
+            $(".total").append(html);
+            console.log(result)
+            if(result.bbsTyCode === "BBST03"){
+                document.querySelector(".krds-file-upload").remove();
             }
         },
         error:function(error){
@@ -210,7 +200,7 @@
             for(var i=0; i<(e.target.files).length; i++){
                 fileList.push(e.target.files[i]);
             }
-            $(".file-upload-result").css("display","block");
+            $(".file-list").css("display","block");
             fileAppend(fileList);
         }
     });
@@ -234,12 +224,16 @@
             }
 
             $(".current").text(fileList.length);
-            html += "<li id='file_"+index+"'><div class='in'>"
-                +"<div class='file-name'>"+name+" ["+type+", "+formatBytes(size)+"]</div>"
-                +"<div class='file-btn' onclick='fileDel("+index+","+sn+")'><button type='button' class='btn btn-txt ico-before ico-del sm h-auto''>삭제</button></div>"
-                +"</div></li>";
+            html = `<li id="file_${index}">
+                        <div class="file-info">
+                            <div class="file-name">${name}[${type}, ${formatBytes(size)}]</div>
+                            <div class="btn-wrap" onclick="fileDel(${index}, ${sn})">
+                                <button type="button" class="krds-btn medium text">삭제<i class='svg-icon ico-delete-fill'></i></button>
+                            </div>
+                        </div>
+                    </li>`
+            $("#upload-list").append(html);
         });
-        $("#upload-list").append(html);
     }
 
     function fileDel(arr,sn){
@@ -248,10 +242,9 @@
         $(".current").text(fileList.length);
         fileAppend(fileList);
         if(fileList.length === 0){
-            $(".file-upload-result").css("display","none");
+            $(".file-list").css("display","none");
         }
         if(sn != null){
-            console.log("삭제할 파일순서 > " + sn);
             deleteFileSn.push(sn);
         }
     }
@@ -276,7 +269,7 @@
             for(var i=0; i<(e.originalEvent.dataTransfer.files).length; i++){
                 fileList.push(e.originalEvent.dataTransfer.files[i]);
             }
-            $(".file-upload-result").css("display","block");
+            $(".file-list").css("display","block");
             fileAppend(fileList);
         }
     });
@@ -284,12 +277,12 @@
     function fileAppendHtmlUpdate(fileList){
         fileList.forEach(function(item,index){
             var sn = item.fileSn;
-            html = "<li id='file_"+index+"'><div class='in'>"
+            html = "<li id='file_"+index+"'><div class='file-info'>"
                 +"<div class='file-name'>"+item.orignlFileNm+" ["+item.fileExtsn+", "+formatBytes(item.fileSize)+"]</div>"
-                +"<div class='file-btn' onclick='fileDel("+index+","+sn+")'><button type='button' class='btn btn-txt ico-before ico-del sm h-auto' id='fileDelete_"+index+"'>삭제</button></div>"
+                +"<div class='btn-wrap' onclick='fileDel("+index+","+sn+")'><button type='button' class='krds-btn medium text' id='fileDelete_"+index+"'>삭제<i class='svg-icon ico-delete-fill'></i></button></div>"
                 +"</div></li>";
 
-            $(".file-upload-result").css("display","block");
+            $(".file-list").css("display","block");
             $(".current").text(fileList.length);
             $("#upload-list").append(html);
         })
@@ -306,21 +299,18 @@
 import {editorConfig} from "../../../../../../../js/ckEditor_simple-main.js";
 import {ClassicEditor} from "../../../../../../ckeditor5_simple/ckeditor5.js";
 
+
 ClassicEditor.create(document.querySelector('#editor'), editorConfig)
     .then(editor => {
         if(nttId != 0 || parnt != 0){
-            console.log("부모글 > " + parnt);
-            console.log("게시글 > " + nttId);
-            if(parnt != 0){
-                nttId = parnt;
-            }
+            //답글 (수정 x)
             $.ajax({
                 url: '/cop/bbs/bbs/selectArticleDetail',
                 method: 'GET',
                 data: { bbsId: bbsId, nttId: nttId },
                 success: function(result){
-                    console.log(result);
-                    if(parnt == 0){
+                    if(nttId != 0){
+                        // 수정
                         console.log("수정");
                         $("#nttSj").val(result.nttSj);
                         editor.setData(result.nttCn);
@@ -352,21 +342,22 @@ ClassicEditor.create(document.querySelector('#editor'), editorConfig)
                                 }
                             })
                         }
-                    }
-
-                    if(parnt != 0){
-                        rdCnt = 0;
-                    }else{
+                        sortOrdr = result.sortOrdr;
+                        frstRegistPnttm = result.frstRegistPnttm;
                         rdCnt = result.rdcnt;
+                        nttNo = result.nttNo;
+                    }else{
+                        rdCnt = 0;
                     }
-                    sortOrdr = result.sortOrdr;
-                    frstRegistPnttm = result.frstRegistPnttm;
-                    answerAt = result.replyPosblAt;
-                    // parnt = parnts;
-                    answerLc = result.answerLc;
+                    if(parnt == 0){
+                        answerAt = "N";
+                    }else{
+                        answerAt = result.replyPosblAt;
+                        answerLc = result.answerLc;
+                        parnt=result.parntscttNo;
+                    }
                 }
             });
-
         }
         $("#insertBtn").click(function(){
             editorData = editor.getData();
@@ -407,6 +398,7 @@ ClassicEditor.create(document.querySelector('#editor'), editorConfig)
         console.error(error);
     });
 
+
 /*********************************************************
  * 게시글 등록 처리 함수
  ******************************************************** */
@@ -422,20 +414,19 @@ function fn_egov_regist_bbs(editorData) {
         ntceEndde: $('input[name="ntceEndde"]').val(),
         bbsId: /*[[${bbsId}]]*/,
         nttId: /*[[${nttId}]]*/,
-        nttNo: 1,
+        nttNo: nttNo,
         useAt:"Y",
         inqireCo:rdCnt,
         atchFileId: atchFileId,
         sortOrdr:sortOrdr,
         replyAt:answerAt,
         parnts:parnt,
-        replyLc:answerLc
+        replyLc:answerLc,
     };
-    console.log(data);
 
-    // if(frstRegistPnttm != null){
-    //     data.frstRegistPnttm = frstRegistPnttm;
-    // }
+    if(frstRegistPnttm != null){
+        data.frstRegistPnttm = frstRegistPnttm;
+    }
 
     const delData= {
         atchFileId: atchFileId,
@@ -461,11 +452,10 @@ function fn_egov_regist_bbs(editorData) {
             method:"post",
             data: delData,
             success:function(result){
-               console.log("삭제완료")
+               alert(result);
             },
             error:function (error){
-               console.log("에러 발생")
-                console.log(error);
+               alert(error);
             }
         });
     }

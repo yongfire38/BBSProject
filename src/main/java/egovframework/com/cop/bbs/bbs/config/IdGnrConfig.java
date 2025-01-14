@@ -131,4 +131,25 @@ public class IdGnrConfig {
         idGnrService.setTableName("STSFDG_NO");
         return idGnrService;
     }
+    
+    @Bean(name = "syncIdStrategy")
+    public EgovIdGnrStrategyImpl syncIdStrategy() {
+        EgovIdGnrStrategyImpl strategy = new EgovIdGnrStrategyImpl();
+        strategy.setPrefix("SYNC_");
+        strategy.setCipers(15);
+        strategy.setFillChar('0');
+        return strategy;
+    }
+    
+    @Bean(name = "egovSyncIdGnrService")
+	public EgovTableIdGnrServiceImpl egovSyncIdGnrService(@Qualifier("syncIdStrategy") EgovIdGnrStrategyImpl syncIdStrategy) {
+    	EgovTableIdGnrServiceImpl idGnrService = new EgovTableIdGnrServiceImpl();
+    	idGnrService.setDataSource(dataSource);
+    	idGnrService.setStrategy(syncIdStrategy);
+    	idGnrService.setBlockSize(10);
+    	idGnrService.setTable("COMTECOPSEQ");
+    	idGnrService.setTableName("SYNC_ID");
+		
+		return idGnrService;
+	}
 }

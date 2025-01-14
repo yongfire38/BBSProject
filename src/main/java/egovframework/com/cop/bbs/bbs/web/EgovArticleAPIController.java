@@ -107,30 +107,13 @@ public class EgovArticleAPIController {
         }
 
         if (true) {                         // 사용자 인증 로직 추가 필요
-            System.out.println("부모아이디 > " + boardVO.getParnts());
             boardVO.setFrstRegisterId("USRCNFRM_00000000000");
-            System.out.println("파일 아이디 > " + boardVO.getAtchFileId());
             egovArticleService.insertArticle(boardVO);
         }
 
         return ResponseEntity.status(HttpStatus.CREATED).body("게시판이 성공적으로 등록되었습니다.");
     }
 
-//    @PostMapping("/cop/bbs/bbs/updateArticle")
-//    public ResponseEntity<?> updateBoardArticle(@RequestBody @Valid BoardMaster boardMaster, BindingResult bindingResult) {
-//        if (bindingResult.hasErrors()) {
-//            Map<String, String> errors = new HashMap<>();
-//            for (FieldError error : bindingResult.getFieldErrors()) {=-09876543211     errors.put(error.getField(), error.getDefaultMessage());
-//            }
-//            return ResponseEntity.badRequest().body(errors);
-//        }
-//
-//        if (true) {                         // 사용자 인증 로직 추가 필요
-//            egovArticleService.updateArticle(boardMaster);
-//        }
-//
-//        return ResponseEntity.status(HttpStatus.CREATED).body("게시판이 성공적으로 수정되었습니다.");
-//    }
     @PostMapping("/cop/bbs/bbs/deleteArticleDetail")
     public ResponseEntity<?> deleteArticle(@ModelAttribute BoardVO boardVO, BindingResult bindingResult){
 
@@ -147,5 +130,11 @@ public class EgovArticleAPIController {
         }
 
         return ResponseEntity.ok().body("게시글이 삭제되었습니다.");
+    }
+
+    @PostMapping("cop/bbs/bbs/selectBBSMasterOptn")
+    public ResponseEntity<?> selectBBSMasterOptn(String bbsId){
+        BoardMasterOptnVO boardMasterOptnVO = egovArticleService.selectBBSMasterOptn(bbsId);
+        return ResponseEntity.ok().body(boardMasterOptnVO);
     }
 }

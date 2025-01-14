@@ -11,4 +11,5 @@ public interface EgovArticleService {
     void insertArticle(BoardVO boardVO) throws Exception;
     void updateArticle(BoardMaster boardMaster);
     void deleteArticle(BoardVO boardVO);
+    BoardMasterOptnVO selectBBSMasterOptn(String bbsId);
 }
