@@ -3,13 +3,14 @@
 <head th:with="pageTitle=#{comCopBbs.boardMasterVO.title}">
     <meta charset="UTF-8">
     <title th:text="${pageTitle} + ' ' + #{title.create}"></title>
-    <link th:href="@{/css/pattern_css.css}" type="text/css" rel="stylesheet">
-    <script src="/js/jquery-3.7.1.min.js"></script>
+<!--    <link th:href="@{/css/pattern_css.css}" type="text/css" rel="stylesheet">-->
+<!--    <script src="/js/jquery-3.7.1.min.js"></script>-->
+    <div th:replace="egovframework/com/cop/bbs/bbs/fragement/linkFragment"></div>
 </head>
 <body th:with="pageTitle=#{comCopBbs.boardMasterVO.title}">
 <!-- javascript warning tag  -->
 <noscript class="noScriptTitle" th:text="#{common.noScriptTitle.msg}"></noscript>
-    <div>
+    <div id="container">
         <h1 th:text="${pageTitle} + ' ' + #{title.create}"></h1><!--게시판 등록-->
         <!-- 게시판 등록 입력폼 -->
         <div class="txt-box bg-white" th:title="#{common.summary.regist(${pageTitle})}">
@@ -46,11 +47,11 @@
                         <div class="form-tit" th:text="#{comCopBbs.boardMasterVO.regist.replyPosblAt}"></div>
                         <div class="form-conts">
                             <div id="test" class="row chk-area" th:title="#{comCopBbs.boardMasterVO.regist.replyPosblAt} + ' ' + #{input.input}">
-                                <div class="form-check lg">
+                                <div class="form-check medium">
                                     <input type="radio" name="replyPosblAt" id="rdo_1-1" value="Y" checked="">
                                     <label for="rdo_1-1">예</label>
                                 </div>
-                                <div class="form-check lg">
+                                <div class="form-check medium">
                                     <input type="radio" name="replyPosblAt" id="rdo_1-2" value="N">
                                     <label for="rdo_1-2">아니오</label>
                                 </div>
@@ -61,11 +62,11 @@
                         <div class="form-tit" th:text="#{comCopBbs.boardMasterVO.regist.fileAtchPosblAt}"></div>
                         <div class="form-conts">
                             <div class="row chk-area" th:title="#{comCopBbs.boardMasterVO.regist.fileAtchPosblAt} + ' ' + #{input.input}">
-                                <div class="form-check lg">
+                                <div class="form-check medium">
                                     <input type="radio" name="fileAtchPosblAt" id="rdo_2-1" value="Y" checked="">
                                     <label for="rdo_2-1">예</label>
                                 </div>
-                                <div class="form-check lg">
+                                <div class="form-check medium">
                                     <input type="radio" name="fileAtchPosblAt" id="rdo_2-2" value="N">
                                     <label for="rdo_2-2">아니오</label>
                                 </div>
@@ -95,11 +96,11 @@
                         <div class="form-tit" th:text="#{comCopBbs.boardMasterVO.regist.useAt}"></div>
                         <div class="form-conts">
                             <div class="row chk-area" th:title="#{comCopBbs.boardMasterVO.regist.useAt} + ' ' + #{input.input}">
-                                <div class="form-check lg">
+                                <div class="form-check medium">
                                     <input type="radio" name="useAt" id="rdo_3-1" value="Y" checked="">
                                     <label for="rdo_3-1">예</label>
                                 </div>
-                                <div class="form-check lg">
+                                <div class="form-check medium">
                                     <input type="radio" name="useAt" id="rdo_3-2" value="N">
                                     <label for="rdo_3-2">아니오</label>
                                 </div>
@@ -110,12 +111,9 @@
             </div>
             <!-- //게시판 등록 입력폼 -->
         </div>
-        <div class="page-btn-wrap both">
-            <button type="button" class="btn xlg tertiary" onclick="window.history.back();" th:text="#{button.list}" th:title="#{button.list} + ' ' + #{input.button}"></button>
-
-            <div class="btn-wrap">
-                <button type="button" class="btn xlg" onclick="fn_egov_regist_bbs()" th:text="#{button.create}" th:title="#{button.create} + ' ' + #{input.button}"></button>
-            </div>
+        <div class="page-btn-wrap chip-wrap">
+            <button type="button" class="krds-btn large tertiary" onclick="window.history.back();" th:text="#{button.list}" th:title="#{button.list} + ' ' + #{input.button}"></button>
+            <button type="button" class="krds-btn large" onclick="fn_egov_regist_bbs()" th:text="#{button.create}" th:title="#{button.create} + ' ' + #{input.button}"></button>
         </div>
     </div>
 

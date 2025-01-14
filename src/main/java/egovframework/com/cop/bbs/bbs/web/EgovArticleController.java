@@ -1,11 +1,11 @@
 package egovframework.com.cop.bbs.bbs.web;
 
+import egovframework.com.cop.bbs.bbs.service.Board;
+import egovframework.com.cop.bbs.bbs.service.BoardVO;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import egovframework.com.cop.bbs.bbs.service.BoardVO;
 
 @Controller
 public class EgovArticleController {

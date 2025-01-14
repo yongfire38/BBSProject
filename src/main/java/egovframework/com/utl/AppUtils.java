@@ -1,21 +1,10 @@
 package egovframework.com.utl;
 
+import egovframework.com.cop.bbs.bbs.entity.*;
+import egovframework.com.cop.bbs.bbs.service.*;
 import org.springframework.beans.BeanUtils;
 
-import egovframework.com.cop.bbs.bbs.entity.ComtnFile;
-import egovframework.com.cop.bbs.bbs.entity.Comtnbbs;
-import egovframework.com.cop.bbs.bbs.entity.ComtnbbsId;
-import egovframework.com.cop.bbs.bbs.entity.Comtnbbsmaster;
-import egovframework.com.cop.bbs.bbs.entity.Comtnbbsmasteroptn;
-import egovframework.com.cop.bbs.bbs.entity.Comtncomment;
-import egovframework.com.cop.bbs.bbs.entity.ComtncommentId;
-import egovframework.com.cop.bbs.bbs.entity.Comtnfiledetail;
-import egovframework.com.cop.bbs.bbs.entity.Comtnstsfdg;
-import egovframework.com.cop.bbs.bbs.service.BoardMasterOptnVO;
-import egovframework.com.cop.bbs.bbs.service.BoardVO;
-import egovframework.com.cop.bbs.bbs.service.CommentVO;
-import egovframework.com.cop.bbs.bbs.service.FileVO;
-import egovframework.com.cop.bbs.bbs.service.SatisfactionVO;
+import java.time.LocalDateTime;
 
 public class AppUtils {
 
@@ -105,4 +94,16 @@ public class AppUtils {
         BeanUtils.copyProperties(satisfactionVO,comtnstsfdg);
         return comtnstsfdg;
     }
+    
+    public static BoardManageVO bbsManageEntityToVO(Comtnbbsmanage comtnbbsmanage){
+    	BoardManageVO boardManageVO = new BoardManageVO();
+    	BeanUtils.copyProperties(comtnbbsmanage, boardManageVO);
+    	return boardManageVO;
+    }
+    
+    public static Comtnbbsmanage bbsManageVOToEntity(BoardManageVO boardManageVO){
+    	Comtnbbsmanage comtnbbsmanage = new Comtnbbsmanage();
+    	BeanUtils.copyProperties(boardManageVO, comtnbbsmanage);
+    	return comtnbbsmanage;
+    } 
 }

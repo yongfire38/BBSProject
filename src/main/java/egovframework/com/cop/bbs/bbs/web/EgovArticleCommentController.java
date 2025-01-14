@@ -50,7 +50,7 @@ public class EgovArticleCommentController {
         result.put("response",response);
 
         EgovPaginationFormat paginationFormat = new EgovPaginationFormat();
-        String paginationHtml = paginationFormat.paginationFormat(paginationInfo, "linkPage");
+        String paginationHtml = paginationFormat.paginationFormat(paginationInfo, "Comment_linkPage");
 
         result.put("pagination", paginationHtml);
         result.put("lineNumber", (commentVO.getPageIndex()-1)*commentVO.getPageSize());

@@ -1,13 +1,13 @@
 package egovframework.com.cop.bbs.bbs.config;
 
-import javax.sql.DataSource;
-
 import org.egovframe.rte.fdl.idgnr.EgovIdGnrService;
 import org.egovframe.rte.fdl.idgnr.impl.EgovTableIdGnrServiceImpl;
 import org.egovframe.rte.fdl.idgnr.impl.strategy.EgovIdGnrStrategyImpl;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import javax.sql.DataSource;
 
 @Configuration
 public class IdGnrConfig {
@@ -131,4 +131,25 @@ public class IdGnrConfig {
         idGnrService.setTableName("STSFDG_NO");
         return idGnrService;
     }
+    
+    @Bean(name = "syncIdStrategy")
+    public EgovIdGnrStrategyImpl syncIdStrategy() {
+        EgovIdGnrStrategyImpl strategy = new EgovIdGnrStrategyImpl();
+        strategy.setPrefix("SYNC_");
+        strategy.setCipers(15);
+        strategy.setFillChar('0');
+        return strategy;
+    }
+    
+    @Bean(name = "egovSyncIdGnrService")
+	public EgovTableIdGnrServiceImpl egovSyncIdGnrService(@Qualifier("syncIdStrategy") EgovIdGnrStrategyImpl syncIdStrategy) {
+    	EgovTableIdGnrServiceImpl idGnrService = new EgovTableIdGnrServiceImpl();
+    	idGnrService.setDataSource(dataSource);
+    	idGnrService.setStrategy(syncIdStrategy);
+    	idGnrService.setBlockSize(10);
+    	idGnrService.setTable("COMTECOPSEQ");
+    	idGnrService.setTableName("SYNC_ID");
+		
+		return idGnrService;
+	}
 }

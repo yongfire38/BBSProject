@@ -3,10 +3,9 @@
 <head th:with="pageTitle=#{comCopBbs.articleVO.title}">
     <meta charset="UTF-8">
     <title th:text="${pageTitle} + ' ' + #{title.detail}"></title>
-    <link th:href="@{/css/pattern_css.css}" type="text/css" rel="stylesheet">
+    <div th:replace="egovframework/com/cop/bbs/bbs/fragement/linkFragment"></div>
     <link rel="stylesheet" th:href="@{/ckeditor5_simple/ckeditor5.css}">
     <link rel="stylesheet" th:href="@{/css/ckEditor_simple-main.css}">
-    <script src="/js/jquery-3.7.1.min.js"></script>
     <style>
         .page-btn-wrap{
             margin-top: 0;
@@ -14,40 +13,41 @@
         #comment-list, #satisfaction-list{
             display: flex;
             flex-direction: column;
-            gap: var(--krds-spacer-5);
+            border: 1px solid lightgray;
+            border-radius: 1rem;
+            margin-top: 2rem;
+            padding-right: 1rem;
         }
         #comment-list li, #satisfaction-list li{
-            background-color: #eee;
+            border-bottom: 1px solid lightgray;
             padding: 2rem;
-            border-radius: 1rem;
         }
         #comment-list li .info-body, #satisfaction-list li .info-body{
             background-color: #fff;
+            padding: 1rem 1rem 0 1rem;
+        }
+        .commentInsert{
+            display: flex;
+            flex-direction: column;
+            background-color: whitesmoke;
+            margin-top: 2rem;
             padding: 2rem;
-            margin-top: 1rem;
-            border-radius: 0.5rem;
+            gap: var(--krds-number-8);
+        }
+        .comment-top{
+            margin-bottom: 1rem;
         }
         .search-list-top{
+            display: flex;
             justify-content: flex-start;
+            gap: var(--krds-number-15);
         }
-        /*.comment-close{*/
-        /*    position: absolute;*/
-        /*    top: 3.2rem;*/
-        /*    right: 3.2rem;*/
-        /*    z-index: 901;*/
-        /*    width: 3.6rem;*/
-        /*    height: 3.6rem;*/
-        /*    background: url("/img/component/common/ico_close_modal.svg") no-repeat center;*/
-        /*    background-size: 2rem;*/
-        /*}*/
-
         .star {
             position: relative;
             font-size: 2rem;
             color: transparent;
             text-shadow: 0 0 0 #f0f0f0;
         }
-
         .star input {
             width: 100%;
             height: 100%;
@@ -56,7 +56,6 @@
             opacity: 0;
             cursor: pointer;
         }
-
         .star span {
             width: 0;
             position: absolute;
@@ -73,107 +72,48 @@
 <noscript class="noScriptTitle" th:text="#{common.noScriptTitle.msg}"></noscript>
 <div class="conts-wrap scroll-check">
     <div class="conts-wrap section-link" id="section_01">
-        <h3 class="sec-tit" th:text="${pageTitle} + ' ' + #{title.detail}"></h3>
-        <!-- table list -->
-        <div class="tbl-wrap" th:title="${#messages.msg('common.summary.inqire', pageTitle)}">
-            <dl class="tbl def-list">
-                <dt th:text="#{comCopBbs.articleVO.detail.nttSj}"></dt>
-                <dd id="nttSj"></dd>
-                <dt th:text="#{table.reger}"></dt>
-                <dd id="frstRegisterNm"></dd>
-                <dt th:text="#{table.regdate}"></dt>
-                <dd id="frstRegistPnttm"></dd>
-                <dt th:text="#{comCopBbs.articleVO.detail.inqireCo}"></dt>
-                <dd id="inqireCo"></dd>
-                <dt th:text="#{comCopBbs.articleVO.detail.nttCn}"></dt>
-                <dd id="nttCn" class="ck-content"></dd>
-                <dt th:text="#{comCopBbs.articleVO.detail.ntceDe}"></dt>
-                <dd id="ntceDe"></dd>
-            </dl>
-        </div>
-        <!-- //table list -->
-        <div class="page-btn-wrap both">
-            <button type="button" class="btn xlg tertiary" onclick="fn_egov_inqire_articlelist()" th:text="#{button.list}" th:title="#{title.list} + ' ' + #{input.button}"></button>
-
-            <div class="btn-wrap">
-                <button type="button" class="btn xlg" id="updateBtn" onclick="fn_egov_updt_view_bbs()" th:text="#{button.update}" th:title="#{title.update} + ' ' + #{input.button}"></button>
-                <button type="button" class="btn xlg" id="deleteBtn" onclick="fn_egov_delete_view_bbs()" th:text="#{button.delete}" th:title="#{button.delete} + ' ' + #{input.button}"></button>
-                <button type="button" class="btn xlg" id="replyBtn" onclick="fn_egov_reply_view_bbs()" th:text="#{button.reply}" th:title="#{button.reply} + ' ' + #{input.button}"></button>
+        <div id="container">
+            <h3 th:text="${pageTitle} + ' ' + #{title.detail}"></h3>
+            <!-- table list -->
+            <div class="tbl-wrap" th:title="${#messages.msg('common.summary.inqire', pageTitle)}">
+                <table class="tbl col data">
+                    <tr>
+                        <th th:text="#{comCopBbs.articleVO.detail.nttSj}"></th>
+                        <td id="nttSj"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{table.reger}"></th>
+                        <td id="frstRegisterNm"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{table.regdate}"></th>
+                        <td id="frstRegistPnttm"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{comCopBbs.articleVO.detail.inqireCo}"></th>
+                        <td id="inqireCo"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{comCopBbs.articleVO.detail.nttCn}"></th>
+                        <td id="nttCn" class="ck-content"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{comCopBbs.articleVO.detail.ntceDe}"></th>
+                        <td id="ntceDe"></td>
+                    </tr>
+                </table>
             </div>
-        </div>
+            <!-- //table list -->
+            <div class="page-btn-wrap chip-wrap">
+                <button type="button" class="krds-btn large tertiary" onclick="fn_egov_inqire_articlelist()" th:text="#{button.list}" th:title="#{title.list} + ' ' + #{input.button}"></button>
+                <div class="btn-wrap" style="width: auto">
+                    <button type="button" class="krds-btn large" id="updateBtn" onclick="fn_egov_updt_view_bbs()" th:text="#{button.update}" th:title="#{title.update} + ' ' + #{input.button}"></button>
+                    <button type="button" class="krds-btn large" id="deleteBtn" onclick="fn_egov_delete_view_bbs()" th:text="#{button.delete}" th:title="#{button.delete} + ' ' + #{input.button}"></button>
+                    <button type="button" class="krds-btn large" id="replyBtn" onclick="fn_egov_reply_view_bbs()" th:text="#{button.reply}" th:title="#{button.reply} + ' ' + #{input.button}"></button>
+                </div>
+            </div>
+        <div class="comment-wrap txt-box bg-white"></div>
     </div>
-    <div class="comment-wrap txt-box bg-white">
-        <!--<div class="comment-list-wrap">
-            <div class="search-list-top">
-                <div class="sch-info">
-                    댓글
-                    <span class="keyword" id="commentCnt"></span>개
-                </div>
-            </div>
-            <ul id="comment-list" class="total-search-list"></ul>
-            <div class="pagination w-page"></div>
-        </div>-->
-        <div class="comment-list-wrap">
-            <div class="search-list-top">
-                <div class="sch-info">
-                    만족도
-                    <span class="keyword" id="satisAverage"></span>점
-                </div>
-                <div class="starAvr">
-                    <span class="star">★★★★★<span class="totalStar">★★★★★</span></span>
-                    <span>(<span class="satisfactionTotalCnt"></span>)</span>
-                </div>
-            </div>
-            <ul id="satisfaction-list" class="total-search-list"></ul>
-            <div class="pagination w-page"></div>
-        </div>
-
-
-<!--        <div class="commentInsert txt-box bg-white" style="gap: var(&#45;&#45;krds-spacer-3); margin-top: 0;">-->
-<!--            <ol class="assess-opinion-list">-->
-<!--                <li class="li">-->
-<!--                    <p class="form-qu">댓글 입력</p>-->
-<!--                    <div class="form-group full">-->
-<!--                        <div class="form-conts">-->
-<!--                            <div class="textarea-wrap">-->
-<!--                                <textarea id="answer" class="form-control" placeholder="내용을 입력해주세요." title="댓글 입력" style="height: 50%" maxlength="200"></textarea>-->
-<!--                                <p class="textarea-count">-->
-<!--                                    <span class="text-primary" id="recentTextCnt">0</span><span class="text-num" id="fullTextCnt">/200</span>-->
-<!--                                </p>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </li>-->
-<!--            </ol>-->
-<!--            <div class="btn-wrap">-->
-<!--                <button type="button" class="btn md" th:text="#{button.create}" style="float: right" onclick="fn_egov_comment_insert()"></button>-->
-<!--            </div>-->
-<!--        </div>-->
-        <div class="commentInsert txt-box bg-white" style="gap: var(--krds-spacer-3); margin-top: 0;">
-            <ol class="assess-opinion-list">
-                <li class="li">
-                    <p class="form-qu">만족도 내용</p>
-                    <span class="star">★★★★★
-                        <span class="stsStarCheck">★★★★★</span>
-		  			    <input type="range" oninput="drawStar()" value = "0" step="1" min="0" max="5" class = "star_range" name = "reviewStar">
-				    </span>
-                    <div class="form-group full">
-                        <div class="form-conts">
-                            <div class="textarea-wrap">
-                                <textarea id="answer" class="form-control" placeholder="내용을 입력해주세요." title="만족도 입력" style="height: 50%" maxlength="200"></textarea>
-                                <p class="textarea-count">
-                                    <span class="text-primary" id="recentTextCnt">0</span><span class="text-num" id="fullTextCnt">/200</span>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-            </ol>
-            <div class="btn-wrap">
-<!--                <button type="button" class="btn md" th:text="#{button.create}" style="float: right" onclick="fn_egov_comment_insert()"></button>-->
-                <button type="button" class="btn md" th:text="#{button.create}" style="float: right" onclick="fn_egov_satisfaction_insert()"></button>
-            </div>
-        </div>
     </div>
 </div>
 
@@ -191,7 +131,8 @@
          ******************************************************** */
         fn_egov_inquire_article_detail(bbsId, nttId);
         // fn_egov_comment_view_list(bbsId, nttId);
-        fn_egov_satistaction_view_list(bbsId,nttId);
+        // fn_egov_satistaction_view_list(bbsId,nttId);
+        fn_egov_bbs_master_optn(bbsId, nttId)
     });
 
     /*********************************************************
@@ -212,16 +153,118 @@
     }
 
     /*********************************************************
+     * 게시판 속성 호출
+     ******************************************************** */
+    function fn_egov_bbs_master_optn(bbsId, nttId){
+        $.ajax({
+            url: "/cop/bbs/bbs/selectBBSMasterOptn",
+            method: "post",
+            data:{"bbsId":bbsId},
+            success: function (result){
+                let html = "";
+                if(result.answerAt == "Y"){
+                    // 댓글인 경우
+                    console.log("댓글");
+                    fn_egov_comment_view_list(bbsId, nttId);
+                    html += `<div class="comment-list-wrap">
+                                <div class="comment_cnt">
+                                    댓글
+                                    <span class="keyword" id="commentCnt"></span>개
+                                </div>
+                                <ul id="comment-list" class="total-search-list"></ul>
+                                <div class="pagination w-page"></div>
+                            </div>`
+                    html += `<div class="commentInsert">
+                                <ol class="comment-list">
+                                    <li class="li">
+                                        <div class="comment-top" style="display:flex; justify-content: space-between">
+                                            <span class="form-qu" style="width: 100%">댓글 입력</span>
+                                            <span class="textarea-count" style="border:none;">
+                                                <span class="text-primary" id="recentTextCnt">0</span><span class="text-num" id="fullTextCnt">/200</span>
+                                            </span>
+                                        </div>
+                                        <div class="form-group full">
+                                            <div class="form-conts">
+                                                <div class="textarea-wrap">
+                                                    <textarea id="answer" class="form-control" placeholder="내용을 입력해주세요." title="댓글 입력" style="height: 50%; border:none;" maxlength="200"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ol>
+                                <div class="btn-wrap">
+                                    <button type="button" class="krds-btn medium" th:text="[(#{button.create})]" style="float: right" onclick="fn_egov_comment_insert()">등록</button>
+                                </div>
+                            </div>`
+                    html += `</div>`;
+                }else if(result.stsfdgAt == "Y"){
+                    // 만족도조사인 경우
+                    console.log("만족도");
+                    fn_egov_satistaction_view_list(bbsId,nttId);
+                    html += `<div class="comment-list-wrap">
+                                <div class="search-list-top">
+                                    <div class="comment_cnt">
+                                        만족도
+                                        <span class="keyword" id="satisAverage">0</span>점
+                                    </div>
+                                    <div class="starAvr">
+                                        <span class="star">★★★★★<span class="totalStar">★★★★★</span></span>
+                                        <span>(<span class="satisfactionTotalCnt">0</span>)</span>
+                                    </div>
+                                </div>
+                                <ul id="satisfaction-list" class="total-search-list"></ul>
+                                <div class="pagination w-page"></div>
+                            </div>`
+                    html += `<div class="commentInsert">
+                                <ol class="comment-list">
+                                    <li class="li">
+                                        <div class="comment-top" style="display: flex; justify-content: space-between">
+                                            <div class="comment-top-left" style="width: 100%">
+                                                <span class="form-qu">만족도 내용</span>
+                                                    <span class="star">★★★★★
+                                                        <span class="stsStarCheck">★★★★★</span>
+                                                        <input type="range" oninput="drawStar()" value = "0" step="1" min="0" max="5" class = "star_range" name = "reviewStar">
+                                                </span>
+                                            </div>
+                                            <div class="comment-top-right">
+                                                <span class="textarea-count">
+                                                    <span class="text-primary" id="recentTextCnt">0</span><span class="text-num" id="fullTextCnt">/200</span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group full">
+                                            <div class="form-conts">
+                                                <div class="textarea-wrap">
+                                                    <textarea id="answer" class="form-control" placeholder="내용을 입력해주세요." title="만족도 입력" style="height: 50%; border:none;" maxlength="200"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ol>
+                                <div class="btn-wrap">
+                                    <button type="button" class="krds-btn medium" th:text="[[#{button.create}]]" style="float: right" onclick="fn_egov_satisfaction_insert()">등록</button>
+                                </div>
+                            </div>`
+                    html += `</div>`;
+                }
+                $(".comment-wrap").append(html);
+                fn_commnet_count()
+            }
+        });
+    }
+
+    /*********************************************************
      * 게시글 렌더링 함수
      ******************************************************** */
     function renderArticleDetail(response) {
         console.log(response);
-        if(response.noticeAt === "Y"){
+        // 공지사항이거나 방명록 게시판의 글일 경우 답글 disabled
+        if(response.noticeAt === "Y" || response.replyPosblAt === "N"){
             $("#replyBtn").prop('disabled', true);
         }
         $('#nttSj').text(response.nttSj);
         $('#frstRegisterNm').text(response.frstRegisterNm);
-        $('#frstRegistPnttm').text(response.frstRegistPnttm);
+        $('#frstRegistPnttm').text(response.frstRegistPnttm.replace("T"," "));
         $('#inqireCo').text(response.rdcnt);
         $('#nttCn').append(response.nttCn);
         $('#ntceDe').text(response.ntceBgnde + " ~ " +response.ntceEndde);
@@ -314,42 +357,43 @@
     // /*********************************************************
     //  * 댓글 목록 호출
     //  ******************************************************** */
-    // function fn_egov_comment_view_list(bbsId, nttId,pageIndex){
-    //     $.ajax({
-    //         url:"/cop/cmt/selectArticleCommentList",
-    //         method:"POST",
-    //         data: { bbsId: bbsId, nttId: nttId, pageIndex:pageIndex},
-    //         success:function(result){
-    //             $("#comment-list li").remove();
-    //             $(".pagination.w-page").children().remove();
-    //             var response = result.response;
-    //             var commentList;
-    //
-    //             if(response.totalElements == 0){
-    //                 $("#commentCnt").text("0");
-    //                 $(".pagination").hide();
-    //             }else{
-    //                 response.content.forEach((item,index) => {
-    //                     commentList=`<li>
-    //                                     <p class="info-top">
-    //                                         <span class="user-info" style="width:100%"><span class="txt" style="font-weight: bold;">${item.wrterNm}</span> | <span class="i-date">${item.frstRegistPnttm.replace("T"," ")}</span></span>
-    //                                         <button type="button" class="comment-close" onclick="fn_egov_comment_delete('${item.bbsId}',${item.nttId},${item.answerNo})" style="background:url('/img/component/common/ico_close_modal.svg')no-repeat center center; width: 3.6rem; height:3.6rem; background-size: 2rem;"><span class="sr-only">닫기</span></button>
-    //                                     </p>
-    //                                     <div class="info-body"><div class="in"><div class="text"><p class="txt">${item.answer}</p></div></div></div>
-    //                                  </li>`;
-    //                     $("#comment-list").append(commentList);
-    //                 });
-    //                 $("#commentCnt").text(response.totalElements);
-    //                 $(".pagination").show();
-    //                 $(".pagination").append(result.pagination);
-    //             }
-    //         },
-    //         error:function(error){
-    //             alert("에러");
-    //             console.log(error);
-    //         }
-    //     })
-    // }
+    function fn_egov_comment_view_list(bbsId, nttId,pageIndex){
+        $.ajax({
+            url:"/cop/cmt/selectArticleCommentList",
+            method:"POST",
+            data: { bbsId: bbsId, nttId: nttId, pageIndex:pageIndex},
+            success:function(result){
+                console.log(result);
+                $("#comment-list li").remove();
+                $(".pagination.w-page").children().remove();
+                var response = result.response;
+                var commentList;
+
+                if(response.totalElements == 0){
+                    $("#commentCnt").text("0");
+                    $(".pagination").hide();
+                }else{
+                    response.content.forEach((item,index) => {
+                        commentList=`<li>
+                                        <p class="info-top">
+                                            <span class="user-info" style="width:100%"><span class="txt" style="font-weight: bold;">${item.wrterNm}</span> | <span class="i-date">${item.frstRegistPnttm.replace("T"," ")}</span></span>
+                                            <button type="button" class="comment-close" onclick="fn_egov_comment_delete('${item.bbsId}',${item.nttId},${item.answerNo})" style="background:url('/img/component/common/ico_close_modal.svg')no-repeat center center; width: 3.6rem; height:3.6rem; background-size: 2rem;"><span class="sr-only">닫기</span></button>
+                                        </p>
+                                        <div class="info-body"><div class="in"><div class="text"><p class="txt">${item.answer}</p></div></div></div>
+                                     </li>`;
+                        $("#comment-list").append(commentList);
+                    });
+                    $("#commentCnt").text(response.totalElements);
+                    $(".pagination").show();
+                    $(".pagination").append(result.pagination);
+                }
+            },
+            error:function(error){
+                alert("에러");
+                console.log(error);
+            }
+        })
+    }
 
     /*********************************************************
      * 댓글 등록
@@ -376,41 +420,43 @@
     /*********************************************************
      * 댓글입력 시 글자 수 카운트
      ******************************************************** */
-    $("#answer").keyup(function(e){
-        const maxCnt = 200;
-       let comment = $(this).val();
-       let commentLen = 0;
+    function fn_commnet_count(){
+        $("#answer").keyup(function(e){
+            const maxCnt = 200;
+            let comment = $(this).val();
+            let commentLen = 0;
 
-        let totalByte=0;
-        for(let i=0; i<comment.length; i++){
-            const each_char = comment.charAt(i);
-            const uni_char = escape(each_char); //유니코드 형식으로 변환
-            if(uni_char.length>4){
-                // 한글 : 2Byte
-                totalByte += 2;
+            let totalByte=0;
+            for(let i=0; i<comment.length; i++){
+                const each_char = comment.charAt(i);
+                const uni_char = escape(each_char); //유니코드 형식으로 변환
+                if(uni_char.length>4){
+                    // 한글 : 2Byte
+                    totalByte += 2;
+                }else{
+                    // 영문,숫자,특수문자 : 1Byte
+                    totalByte += 1;
+                }
+                if(totalByte <= maxCnt){
+                    commentLen += 1;
+                }
+            }
+
+            if(comment.length == 0 || comment == ""){
+                $("#recentTextCnt").text(0);
             }else{
-                // 영문,숫자,특수문자 : 1Byte
-                totalByte += 1;
+                $("#recentTextCnt").text(totalByte);
             }
-            if(totalByte <= maxCnt){
-                commentLen += 1;
+
+            if(totalByte < 200){
+                $("#recentTextCnt").css("color","#246BEB");
+            }else{
+                $(this).val($(this).val().substring(0, commentLen));
+                $("#recentTextCnt").css("color","red");
             }
-        }
+        });
+    }
 
-       if(comment.length == 0 || comment == ""){
-           $("#recentTextCnt").text(0);
-       }else{
-           $("#recentTextCnt").text(totalByte);
-       }
-
-       if(totalByte < 200){
-           $("#recentTextCnt").css("color","#246BEB");
-       }else{
-           $(this).val($(this).val().substring(0, commentLen));
-           $("#recentTextCnt").css("color","red");
-       }
-
-    });
 
     function fn_egov_comment_delete(bbsId,nttId,answerNo){
         $.ajax({
@@ -446,13 +492,14 @@
                 }else{
                     var stsfdgList;
                     response.forEach((item,index) => {
+                        console.log(item);
                         stsfdgList=`<li>
                                     <p class="info-top">
                                         <span class="user-info" style="width:100%"><span class="txt" style="font-weight: bold;">${item.wrterNm}</span> | <span class="i-date">${item.frstRegistPnttm.replace("T"," ")}</span></span>
                                         <button type="button" class="satisfaction-close" onclick="fn_egov_satisfaction_delete('${item.bbsId}',${item.nttId},${item.stsfdgNo})" style="background:url('/img/component/common/ico_close_modal.svg')no-repeat center center; width: 3.6rem; height:3.6rem; background-size: 2rem;"><span class="sr-only">닫기</span></button>
                                     </p>
                                     <div class="stsfdg-area">
-                                        <span class="star" style="color:lightgray">★★★★★<span style="width:${item.stsfdg*20}%">★★★★★</span></span>
+                                        <span class="star" style="color:lightgray">★★★★★<span style="width:${item.stsfdg*20}%">★★★★★</span></span>&nbsp<span>${item.stsfdg.toFixed(1)}</span>
                                     </div>
                                     <div class="info-body"><div class="in"><div class="text"><p class="txt">${item.stsfdgCn}</p></div></div></div>
                                  </li>`;
@@ -487,8 +534,9 @@
                 alert(response);
                 fn_egov_satistaction_view_list(bbsId, nttId)
                 $("#answer").val("");
-                $(".reviewStar").val(0);
+                $(".star_range").val(0);
                 $("#recentTextCnt").val(0);
+                $(".stsStarCheck").css("width", 0);
             },
             error: function(error){
                 alert('에러 발생 !!!');
@@ -515,16 +563,15 @@
 
     function drawStar(){
         var starval = $(".star_range").val();
-        console.log(starval);
         var starvalue = starval * 20;
         $(".stsStarCheck").css("width", starvalue+"%");
     }
 
-    // function linkPage(pageIndex) {
-    //     fn_egov_comment_view_list(bbsId, nttId,pageIndex)
-    // }
+    function Comment_linkPage(pageIndex) {
+        fn_egov_comment_view_list(bbsId, nttId,pageIndex)
+    }
 
-    function linkPage(pageIndex) {
+    function Satisfaction_linkPage(pageIndex) {
         fn_egov_satistaction_view_list(bbsId, nttId,pageIndex)
     }
 

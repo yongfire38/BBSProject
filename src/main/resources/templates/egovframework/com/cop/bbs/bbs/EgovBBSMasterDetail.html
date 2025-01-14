@@ -3,48 +3,68 @@
 <head th:with="pageTitle=#{comCopBbs.boardMasterVO.title}">
     <meta charset="UTF-8">
     <title th:text="${pageTitle} + ' ' + #{title.detail}"></title>
-    <link th:href="@{/css/pattern_css.css}" type="text/css" rel="stylesheet">
-    <script src="/js/jquery-3.7.1.min.js"></script>
+    <div th:replace="egovframework/com/cop/bbs/bbs/fragement/linkFragment"></div>
 </head>
 <body th:with="pageTitle=#{comCopBbs.boardMasterVO.title}">
 <!-- javascript warning tag  -->
 <noscript class="noScriptTitle" th:text="#{common.noScriptTitle.msg}"></noscript>
 <div class="conts-wrap scroll-check">
     <div class="conts-wrap section-link" id="section_01">
-        <h3 class="sec-tit" th:text="${pageTitle} + ' ' + #{title.detail}"></h3>
-        <!-- table list -->
-        <div class="tbl-wrap" th:title="${#messages.msg('common.summary.inqire', pageTitle)}">
-            <dl class="tbl def-list">
-                <dt th:text="#{comCopBbs.boardMasterVO.detail.bbsNm}"></dt>
-                <dd id="bbsNm"></dd>
-                <dt th:text="#{comCopBbs.boardMasterVO.detail.bbsTyCode}"></dt>
-                <dd id="bbsTyCode"></dd>
-                <dt th:text="#{table.reger}"></dt>
-                <dd id="frstRegisterNm"></dd>
-                <dt th:text="#{table.regdate}"></dt>
-                <dd id="frstRegistPnttm"></dd>
-                <dt th:text="#{comCopBbs.boardMasterVO.detail.useAt}"></dt>
-                <dd id="useAt"></dd>
-                <dt th:text="#{comCopBbs.boardMasterVO.detail.replyPosblAt}"></dt>
-                <dd id="replyPosblAt"></dd>
-                <dt th:text="#{comCopBbs.boardMasterVO.detail.fileAtchPosblAt}"></dt>
-                <dd id="fileAtchPosblAt"></dd>
-                <dt th:text="#{comCopBbs.boardMasterVO.detail.atchPosblFileNumber}"></dt>
-                <dd id="atchPosblFileNumber"></dd>
-                <dt th:text="#{comCopBbs.boardMasterVO.detail.bbsIntrcn}"></dt>
-                <dd id="bbsIntrcn"></dd>
-                <dt th:text="#{comCopBbs.boardMasterVO.detail.bbsAdres}"></dt>
-                <dd id="bbsAdres"></dd>
-                <dt th:text="#{comCopBbs.boardMasterVO.detail.option}"></dt>
-                <dd id="option"></dd>
-            </dl>
-        </div>
-        <!-- //table list -->
-        <div class="page-btn-wrap both">
-            <button type="button" class="btn xlg tertiary" onclick="fn_egov_inqire_bbslist()" th:text="#{button.list}" th:title="#{title.list} + ' ' + #{input.button}"></button>
-
-            <div class="btn-wrap">
-                <button type="button" class="btn xlg" id="updateBtn" onclick="fn_egov_updt_view_bbs()" th:text="#{button.update}" th:title="#{title.update} + ' ' + #{input.button}"></button>
+        <div id="container">
+            <h1 th:text="${pageTitle} + ' ' + #{title.detail}"></h1>
+            <!-- table list -->
+            <div class="tbl-wrap" th:title="${#messages.msg('common.summary.inqire', pageTitle)}">
+                <table class="tbl col data">
+                    <tr>
+                        <th th:text="#{comCopBbs.boardMasterVO.detail.bbsNm}"></th>
+                        <td id="bbsNm"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{comCopBbs.boardMasterVO.detail.bbsTyCode}"></th>
+                        <td id="bbsTyCode"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{table.reger}"></th>
+                        <td id="frstRegisterNm"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{table.regdate}"></th>
+                        <td id="frstRegistPnttm"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{comCopBbs.boardMasterVO.detail.useAt}"></th>
+                        <td id="useAt"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{comCopBbs.boardMasterVO.detail.replyPosblAt}"></th>
+                        <td id="replyPosblAt"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{comCopBbs.boardMasterVO.detail.fileAtchPosblAt}"></th>
+                        <td id="fileAtchPosblAt"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{comCopBbs.boardMasterVO.detail.atchPosblFileNumber}"></th>
+                        <td id="atchPosblFileNumber"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{comCopBbs.boardMasterVO.detail.bbsIntrcn}"></th>
+                        <td id="bbsIntrcn"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{comCopBbs.boardMasterVO.detail.bbsAdres}"></th>
+                        <td id="bbsAdres"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{comCopBbs.boardMasterVO.detail.option}"></th>
+                        <td id="option"></td>
+                    </tr>
+                </table>
+            </div>
+            <!-- //table list -->
+            <div class="page-btn-wrap chip-wrap">
+                <button type="button" class="krds-btn large tertiary" onclick="fn_egov_inqire_bbslist()" th:text="#{button.list}" th:title="#{title.list} + ' ' + #{input.button}"></button>
+                <button type="button" class="krds-btn large" id="updateBtn" onclick="fn_egov_updt_view_bbs()" th:text="#{button.update}" th:title="#{title.update} + ' ' + #{input.button}"></button>
             </div>
         </div>
     </div>

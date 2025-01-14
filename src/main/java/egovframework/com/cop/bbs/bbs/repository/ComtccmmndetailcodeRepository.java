@@ -1,7 +1,6 @@
 package egovframework.com.cop.bbs.bbs.repository;
 
 import egovframework.com.cop.bbs.bbs.entity.Comtccmmndetailcode;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

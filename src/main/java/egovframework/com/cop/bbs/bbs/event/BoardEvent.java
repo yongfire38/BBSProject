@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BoardEvent {
-    private BoardEventType eventType;
+private BoardEventType eventType;
     private Long nttId;
     private String bbsId;
     private String nttSj;

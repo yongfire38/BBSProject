@@ -56,7 +56,7 @@ public class EgovBBSSatisfactionController {
         result.put("satisAvr",map.get("satisfactionAverage"));
 
         EgovPaginationFormat paginationFormat = new EgovPaginationFormat();
-        String paginationHtml = paginationFormat.paginationFormat(paginationInfo, "linkPage");
+        String paginationHtml = paginationFormat.paginationFormat(paginationInfo, "Satisfaction_linkPage");
 
         result.put("pagination", paginationHtml);
         result.put("lineNumber", (satisfactionVO.getPageIndex()-1)*satisfactionVO.getPageSize());

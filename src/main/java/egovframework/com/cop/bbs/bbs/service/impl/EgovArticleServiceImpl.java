@@ -8,7 +8,12 @@ import java.util.Map;
 
 import javax.transaction.Transactional;
 
+import egovframework.com.cop.bbs.bbs.entity.*;
+import egovframework.com.cop.bbs.bbs.event.BoardEvent;
+import egovframework.com.cop.bbs.bbs.event.BoardEventType;
+import egovframework.com.cop.bbs.bbs.service.*;
 import org.egovframe.rte.fdl.idgnr.EgovIdGnrService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.data.domain.Page;
@@ -16,21 +21,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import egovframework.com.cop.bbs.bbs.entity.Comtnbbs;
-import egovframework.com.cop.bbs.bbs.entity.ComtnbbsId;
-import egovframework.com.cop.bbs.bbs.entity.Comtncomment;
-import egovframework.com.cop.bbs.bbs.event.BoardEvent;
-import egovframework.com.cop.bbs.bbs.event.BoardEventType;
 import egovframework.com.cop.bbs.bbs.repository.ComtnbbsRepository;
 import egovframework.com.cop.bbs.bbs.repository.ComtnbbsmasteroptnRepository;
 import egovframework.com.cop.bbs.bbs.repository.ComtncommentRepository;
-import egovframework.com.cop.bbs.bbs.service.BBSDTO;
-import egovframework.com.cop.bbs.bbs.service.BBSListDTO;
-import egovframework.com.cop.bbs.bbs.service.Board;
-import egovframework.com.cop.bbs.bbs.service.BoardMaster;
-import egovframework.com.cop.bbs.bbs.service.BoardMasterVO;
-import egovframework.com.cop.bbs.bbs.service.BoardVO;
-import egovframework.com.cop.bbs.bbs.service.EgovArticleService;
 import egovframework.com.utl.AppUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,15 +38,15 @@ public class EgovArticleServiceImpl implements EgovArticleService {
 
     @Qualifier("egovArticleIdGnrService")
     private final EgovIdGnrService idgenServiceArticle;
+    
 
-    public EgovArticleServiceImpl(ComtnbbsRepository comtnbbsRepository, ComtncommentRepository comtncommentRepository, ComtnbbsmasteroptnRepository comtnbbsmasteroptnRepository, 
-    		StreamBridge streamBridge,
+    public EgovArticleServiceImpl(ComtnbbsRepository comtnbbsRepository, ComtncommentRepository comtncommentRepository, ComtnbbsmasteroptnRepository comtnbbsmasteroptnRepository, StreamBridge streamBridge,
     		@Qualifier("egovArticleIdGnrService") EgovIdGnrService idgenServiceArticle
     		) {
         this.comtnbbsRepository = comtnbbsRepository;
         this.comtncommentRepository = comtncommentRepository;
         this.comtnbbsmasteroptnRepository = comtnbbsmasteroptnRepository;
-		this.streamBridge = streamBridge;
+        this.streamBridge = streamBridge;
         this.idgenServiceArticle = idgenServiceArticle;
     }
 
@@ -93,9 +86,11 @@ public class EgovArticleServiceImpl implements EgovArticleService {
         }
 
         // 게시글 옵션
-        String answerAt = comtnbbsmasteroptnRepository.findById(board.getBbsId()).get().getAnswerAt();
-        String stsfdgAt = comtnbbsmasteroptnRepository.findById(board.getBbsId()).get().getStsfdgAt();
+//        Comtnbbsmasteroptn comtnbbsmasteroptn = comtnbbsmasteroptnRepository.findById(board.getBbsId()).get();
         BBSDTO bbsdto = comtnbbsRepository.selectArticleDetail(board.getBbsId(), board.getNttId());
+
+        BoardVO boardVO = new BoardVO();
+        BeanUtils.copyProperties(bbsdto,boardVO);
 
         return bbsdto;
     }
@@ -179,9 +174,9 @@ public class EgovArticleServiceImpl implements EgovArticleService {
                     .build();
             
             streamBridge.send("basicProducer-out-0", event);
-            
-    	} catch (Exception e) {
-    		log.error("Error occurred during insertion or indexing:", e);
+    	}
+        catch (Exception e) {
+            log.error("Error occurred during insertion or indexing:", e);
     		throw e;
     	}
     }
@@ -229,7 +224,13 @@ public class EgovArticleServiceImpl implements EgovArticleService {
             parntsItem(bbs.getComtnbbsId().getBbsId(),bbs.getComtnbbsId().getNttId());
         }
     }
-    
+
+    @Override
+    public BoardMasterOptnVO selectBBSMasterOptn(String bbsId) {
+        Comtnbbsmasteroptn comtnbbsmasteroptn = comtnbbsmasteroptnRepository.findById(bbsId).get();
+        return AppUtils.bbsmasteroptnEntityToVO(comtnbbsmasteroptn);
+    }
+
     public void parntsItem(String bbsId, long nttId){
         List<Comtnbbs> rList = comtnbbsRepository.findAllByParntscttNo((int)nttId);
         List<Comtncomment> commentList = comtncommentRepository.findAllByComtncommentId_BbsIdAndComtncommentId_NttId(bbsId,nttId);
@@ -247,4 +248,23 @@ public class EgovArticleServiceImpl implements EgovArticleService {
             }
         }
     }
+    
+//    private void insertToBbsManageInfo(Long nttId, String bbsId, String syncSttusCode) throws Exception {
+//    	Comtnbbsmanage comtnbbsmanage = new Comtnbbsmanage();
+//    	ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+//		Date localDate = Date.from(now.toInstant());
+//
+//		String syncId = idgenServiceManager.getNextStringId();
+//		comtnbbsmanage.setSyncId(syncId);
+//		comtnbbsmanage.setNttId(nttId);
+//		comtnbbsmanage.setBbsId(bbsId);
+//		comtnbbsmanage.setSyncSttusCode(syncSttusCode);
+//		comtnbbsmanage.setRegistPnttm(localDate);
+//
+//		if(syncSttusCode.equals("E")) {
+//			comtnbbsmanage.setErrorPnttm(localDate);
+//		}
+//
+//		AppUtils.bbsManageEntityToVO(comtnbbsmanageRepository.save(comtnbbsmanage));
+//    }
 }

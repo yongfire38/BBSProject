@@ -3,39 +3,38 @@
 <head th:with="pageTitle=#{comCopBbs.boardMasterVO.title}">
     <meta charset="UTF-8">
     <title th:text="${pageTitle} + ' ' + #{title.list}"></title><!--게시판 목록-->
-    <link th:href="@{/css/pattern_css.css}" type="text/css" rel="stylesheet">
-    <script src="/js/jquery-3.7.1.min.js"></script>
+    <div th:replace="egovframework/com/cop/bbs/bbs/fragement/linkFragment"></div>
+<!--    <link th:href="@{/css/pattern_css.css}" type="text/css" rel="stylesheet">-->
+<!--    <script src="/js/jquery-3.7.1.min.js"></script>-->
 </head>
 <body th:with="pageTitle=#{comCopBbs.boardMasterVO.title}">
 <!-- javascript warning tag  -->
 <noscript class="noScriptTitle" th:text="#{common.noScriptTitle.msg}"></noscript>
-    <div>
+    <div id="container">
         <h1 th:text="${pageTitle} + ' ' + #{title.list}"></h1><!--게시판 목록-->
         <!--하단 버튼-->
         <!-- 검색 입력폼 -->
         <div class="search-top-box" th:title="#{common.searchCondition.msg}">
             <div class="sch-form-wrap">
-                <select class="form-select" name="searchCnd" id="searchCnd" th:title="#{title.searchCondition} + ' ' + #{input.cSelect}">
-                    <option value="0" th:selected="${searchCnd == '0'}">
-                        <span th:text="#{comCopBbs.boardMasterVO.list.bbsNm}"></span>
-                    </option>
-                    <option value="1" th:selected="${searchCnd == '1'}">
-                        <span th:text="#{comCopBbs.boardMasterVO.list.bbsIntrcn}"></span>
-                    </option>
-                </select>
+                <div class="form-conts">
+                    <select class="form-select large" name="searchCnd" id="searchCnd" th:title="#{title.searchCondition} + ' ' + #{input.cSelect}">
+                        <option value="0" th:selected="${searchCnd == '0'}" th:text="#{comCopBbs.boardMasterVO.list.bbsNm}"></option>
+                        <option value="1" th:selected="${searchCnd == '1'}" th:text="#{comCopBbs.boardMasterVO.list.bbsIntrcn}"></option>
+                    </select>
+                </div>
                 <div class="sch-input">
                     <input type="text" class="form-control" placeholder="검색어를 입력해주세요" name="searchWrd" id="searchWrd" th:title="#{title.search} + ' ' + #{input.input}">
-                    <button type="button" class="btn btn-ico ico-sch" onclick="fn_egov_search_bbssj(1)" th:title="#{title.inquire} + ' ' + #{input.button}">
+                    <button type="button" class="krds-btn svg-icon ico-sch" onclick="fn_egov_search_bbssj(1)" th:title="#{title.inquire} + ' ' + #{input.button}">
                         <span class="sr-only" th:text="#{button.inquire}"></span>
                     </button>
                 </div>
-                <button type="button" class="btn" onclick="window.location.href = '/cop/bbs/bbs/insertBBSMasterView';" th:text="#{button.create}" th:title="#{button.create} + ' ' + #{input.button}"></button>
+                <button type="button" class="krds-btn" onclick="window.location.href = '/cop/bbs/bbs/insertBBSMasterView';" th:text="#{button.create}" th:title="#{button.create} + ' ' + #{input.button}"></button>
             </div>
         </div>
         <!-- //검색 입력폼 -->
 
         <!-- 검색 결과 : 리스트 -->
-        <ul class="search-list type1" id="bbsList" th:title="#{common.summary.list(${pageTitle})}">
+        <ul class="structured-list" id="bbsList" th:title="#{common.summary.list(${pageTitle})}">
             <!-- 기본적으로 빈 목록을 렌더링 -->
         </ul>
         <!-- //검색 결과 : 리스트 -->
@@ -97,13 +96,13 @@
             if (response.content.length > 0) {
                 const totalElements = response.totalElements;
                 response.content.forEach((bbs, index) => {
-                    const listItem = `<li class="li">
+                    console.log(bbs);
+                    const listItem = `<li class="structured-item">
                         <div class="in">
                             <div class="card-top">
-                                <span title="${messages['table.num']}">${totalElements - ((response.number * response.size) + index)}</span>
-                                <div class="btn-area">
-                                    <button type="button" class="sm">${messages['table.reger']} : </button>
-                                    <button type="button" class="sm">${bbs.frstRegisterNm}</button>
+                                <div class="krds-badge-wrap">
+                                    <span class="krds-badge outline-information">${bbs.codeNm}</span>
+                                    <span class="krds-badge ${bbs.useAt === 'Y' ? 'bg-light-success' : 'bg-light-point'}" title="${messages['comCopBbs.boardMasterVO.list.useAt']}">${bbs.useAt === 'Y' ? '사용중' : '미사용'}</span>
                                 </div>
                             </div>
                             <div class="card-body">
@@ -113,23 +112,24 @@
                                         <strong class="key">${messages['table.regdate']}</strong>
                                         <span class="value">${bbs.frstRegistPnttm}</span>
                                     </p>
+                                    <p>
+                                        <strong>${messages['table.reger']} </strong>
+                                        <span>${bbs.frstRegisterNm}</span>
+                                    </p>
                                 </a>
-                            </div>
-                            <div class="card-btm">
-                                <span class="krds-badge" title="${messages['comCopBbs.boardMasterVO.list.useAt']}">${bbs.useAt === 'Y' ? '사용중' : '미사용'}</span>
                             </div>
                         </div>
                     </li>`;
                     bbsList.append(listItem);
                 });
             } else {
-                const listItem = `<li class="li">
+                const listItem = `<li class="structured-item">
                     <div class="in">
                         <div class="card-top">
                             <span  title="${messages['table.num']}">1</span>
-                            <div class="btn-area">
-                                <button type="button" class="sm">${messages['table.reger']} : </button>
-                                <button type="button" class="sm">데이터 없음</button>
+                            <div class="card-btn">
+                                <button type="button" class="krds-btn small">${messages['table.reger']} : </button>
+                                <button type="button" class="krds-btn small">데이터 없음</button>
                             </div>
                         </div>
                         <div class="card-body">
@@ -142,7 +142,7 @@
                             </a>
                         </div>
                         <div class="card-btm">
-                            <span class="krds-badge" title="${messages['comCopBbs.boardMasterVO.list.useAt']}">미사용</span>
+                            <span class="tag" title="${messages['comCopBbs.boardMasterVO.list.useAt']}">미사용</span>
                         </div>
                     </div>
                 </li>`;

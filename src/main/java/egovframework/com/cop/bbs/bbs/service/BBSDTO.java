@@ -43,7 +43,6 @@ public class BBSDTO {
         this.frstRegisterId = frstRegisterId;
         this.frstRegisterNm = frstRegisterNm;
         this.frstRegistPnttm = frstRegistPnttm;
-//        this.setFrstRegistPnttm(frstRegistPnttm);
         this.ntceBgnde = ntceBgnde;
         this.ntceEndde = ntceEndde;
         this.rdcnt = rdcnt;

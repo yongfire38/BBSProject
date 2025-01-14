@@ -3,14 +3,15 @@
 <head th:with="pageTitle=#{comCopBbs.boardMasterVO.title}">
     <meta charset="UTF-8">
     <title th:text="${pageTitle} + ' ' + #{title.update}"></title>
-    <link th:href="@{/css/pattern_css.css}" type="text/css" rel="stylesheet">
-    <script src="/js/jquery-3.7.1.min.js"></script>
+<!--    <link th:href="@{/css/pattern_css.css}" type="text/css" rel="stylesheet">-->
+<!--    <script src="/js/jquery-3.7.1.min.js"></script>-->
+    <div th:replace="egovframework/com/cop/bbs/bbs/fragement/linkFragment"></div>
 </head>
 <body th:with="pageTitle=#{comCopBbs.boardMasterVO.title}">
 <!-- javascript warning tag  -->
 <noscript class="noScriptTitle" th:text="#{common.noScriptTitle.msg}"></noscript>
 <form name="bbsMasterDTO" id="bbsMasterDTO">
-    <div>
+    <div id="container">
         <h1 th:text="${pageTitle} + ' ' + #{title.update}"></h1><!--게시판 수정-->
         <!-- 게시판 수정 입력폼 -->
         <div class="txt-box bg-white" th:title="#{common.summary.update(${pageTitle})}">
@@ -112,12 +113,9 @@
             </div>
             <!-- //게시판 수정 입력폼 -->
         </div>
-        <div class="page-btn-wrap both">
-            <button type="button" class="btn xlg tertiary" onclick="fn_egov_inqire_bbslist()" id="listButton" th:text="#{button.list}" th:title="#{button.list} + ' ' + #{input.button}"></button>
-
-            <div class="btn-wrap">
-                <button type="button" class="btn xlg" onclick="fn_egov_updt_bbs()" th:text="#{button.update}" th:title="#{button.update} + ' ' + #{input.button}"></button>
-            </div>
+        <div class="page-btn-wrap chip-wrap">
+            <button type="button" class="krds-btn large tertiary" onclick="fn_egov_inqire_bbslist()" id="listButton" th:text="#{button.list}" th:title="#{button.list} + ' ' + #{input.button}"></button>
+            <button type="button" class="krds-btn large" onclick="fn_egov_updt_bbs()" th:text="#{button.update}" th:title="#{button.update} + ' ' + #{input.button}"></button>
         </div>
     </div>
 
