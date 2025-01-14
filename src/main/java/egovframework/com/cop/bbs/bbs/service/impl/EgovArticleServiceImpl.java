@@ -223,6 +223,18 @@ public class EgovArticleServiceImpl implements EgovArticleService {
             comtnbbsRepository.save(bbs);
             parntsItem(bbs.getComtnbbsId().getBbsId(),bbs.getComtnbbsId().getNttId());
         }
+        
+        // 게시글 삭제 후 이벤트 발행
+        BoardEvent event = BoardEvent.builder()
+                .eventType(BoardEventType.DELETE)
+                .nttId(boardVO.getNttId())
+                .bbsId(boardVO.getBbsId())
+                .nttSj(boardVO.getNttSj())
+                .nttCn(boardVO.getNttCn())
+                .eventDateTime(new Date())
+                .build();
+        
+        streamBridge.send("basicProducer-out-0", event);
     }
 
     @Override
