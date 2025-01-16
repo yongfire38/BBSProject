@@ -260,23 +260,4 @@ public class EgovArticleServiceImpl implements EgovArticleService {
             }
         }
     }
-    
-//    private void insertToBbsManageInfo(Long nttId, String bbsId, String syncSttusCode) throws Exception {
-//    	Comtnbbsmanage comtnbbsmanage = new Comtnbbsmanage();
-//    	ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
-//		Date localDate = Date.from(now.toInstant());
-//
-//		String syncId = idgenServiceManager.getNextStringId();
-//		comtnbbsmanage.setSyncId(syncId);
-//		comtnbbsmanage.setNttId(nttId);
-//		comtnbbsmanage.setBbsId(bbsId);
-//		comtnbbsmanage.setSyncSttusCode(syncSttusCode);
-//		comtnbbsmanage.setRegistPnttm(localDate);
-//
-//		if(syncSttusCode.equals("E")) {
-//			comtnbbsmanage.setErrorPnttm(localDate);
-//		}
-//
-//		AppUtils.bbsManageEntityToVO(comtnbbsmanageRepository.save(comtnbbsmanage));
-//    }
 }
