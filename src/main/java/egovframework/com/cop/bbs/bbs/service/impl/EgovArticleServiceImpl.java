@@ -173,7 +173,7 @@ public class EgovArticleServiceImpl implements EgovArticleService {
                     .eventDateTime(new Date())
                     .build();
             
-            streamBridge.send("basicProducer-out-0", event);
+            streamBridge.send("searchProducer-out-0", event);
     	}
         catch (Exception e) {
             log.error("Error occurred during insertion or indexing:", e);
@@ -234,7 +234,7 @@ public class EgovArticleServiceImpl implements EgovArticleService {
                 .eventDateTime(new Date())
                 .build();
         
-        streamBridge.send("basicProducer-out-0", event);
+        streamBridge.send("searchProducer-out-0", event);
     }
 
     @Override
