@@ -10,6 +10,6 @@ public interface EgovArticleService {
     BBSDTO selectArticleDetail(Board board);
     void insertArticle(BoardVO boardVO) throws Exception;
     void updateArticle(BoardMaster boardMaster);
-    void deleteArticle(BoardVO boardVO);
+    void deleteArticle(BoardVO boardVO) throws Exception;
     BoardMasterOptnVO selectBBSMasterOptn(String bbsId);
 }

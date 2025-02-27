@@ -1,27 +1,38 @@
 package egovframework.com.cop.bbs.bbs.web;
 
-import egovframework.com.cmm.util.EgovFileMngUtil;
-import egovframework.com.cop.bbs.bbs.pagination.EgovPaginationFormat;
-import egovframework.com.cop.bbs.bbs.service.*;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.validation.Valid;
+
 import org.egovframe.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.springframework.web.multipart.MultipartRequest;
 
-import javax.faces.annotation.RequestMap;
-import javax.faces.annotation.RequestParameterMap;
-import javax.validation.Valid;
-import java.io.File;
-import java.time.LocalDateTime;
-import java.util.*;
+import egovframework.com.cmm.util.EgovFileMngUtil;
+import egovframework.com.cop.bbs.bbs.pagination.EgovPaginationFormat;
+import egovframework.com.cop.bbs.bbs.service.BBSListDTO;
+import egovframework.com.cop.bbs.bbs.service.Board;
+import egovframework.com.cop.bbs.bbs.service.BoardMasterOptnVO;
+import egovframework.com.cop.bbs.bbs.service.BoardMasterVO;
+import egovframework.com.cop.bbs.bbs.service.BoardVO;
+import egovframework.com.cop.bbs.bbs.service.EgovArticleService;
+import egovframework.com.cop.bbs.bbs.service.EgovFileMngService;
+import egovframework.com.cop.bbs.bbs.service.FileVO;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequiredArgsConstructor
@@ -126,7 +137,11 @@ public class EgovArticleAPIController {
         }
 
         if(true){
-            egovArticleService.deleteArticle(boardVO);
+            try {
+				egovArticleService.deleteArticle(boardVO);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
         }
 
         return ResponseEntity.ok().body("게시글이 삭제되었습니다.");
