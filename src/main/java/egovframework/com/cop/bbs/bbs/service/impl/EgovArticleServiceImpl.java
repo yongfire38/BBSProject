@@ -1,6 +1,7 @@
 package egovframework.com.cop.bbs.bbs.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -8,10 +9,6 @@ import java.util.Map;
 
 import javax.transaction.Transactional;
 
-import egovframework.com.cop.bbs.bbs.entity.*;
-import egovframework.com.cop.bbs.bbs.event.BoardEvent;
-import egovframework.com.cop.bbs.bbs.event.BoardEventType;
-import egovframework.com.cop.bbs.bbs.service.*;
 import org.egovframe.rte.fdl.idgnr.EgovIdGnrService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -20,13 +17,26 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
 
+import egovframework.com.cop.bbs.bbs.entity.Comtnbbs;
+import egovframework.com.cop.bbs.bbs.entity.ComtnbbsId;
+import egovframework.com.cop.bbs.bbs.entity.Comtnbbsmasteroptn;
+import egovframework.com.cop.bbs.bbs.entity.Comtnbbssynclog;
+import egovframework.com.cop.bbs.bbs.entity.Comtncomment;
+import egovframework.com.cop.bbs.bbs.event.BoardEvent;
+import egovframework.com.cop.bbs.bbs.event.BoardEventType;
 import egovframework.com.cop.bbs.bbs.repository.ComtnbbsRepository;
 import egovframework.com.cop.bbs.bbs.repository.ComtnbbsmasteroptnRepository;
 import egovframework.com.cop.bbs.bbs.repository.ComtnbbssynclogRepository;
 import egovframework.com.cop.bbs.bbs.repository.ComtncommentRepository;
+import egovframework.com.cop.bbs.bbs.service.BBSDTO;
+import egovframework.com.cop.bbs.bbs.service.BBSListDTO;
+import egovframework.com.cop.bbs.bbs.service.Board;
+import egovframework.com.cop.bbs.bbs.service.BoardMaster;
+import egovframework.com.cop.bbs.bbs.service.BoardMasterOptnVO;
+import egovframework.com.cop.bbs.bbs.service.BoardMasterVO;
+import egovframework.com.cop.bbs.bbs.service.BoardVO;
+import egovframework.com.cop.bbs.bbs.service.EgovArticleService;
 import egovframework.com.utl.AppUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -170,13 +180,16 @@ public class EgovArticleServiceImpl implements EgovArticleService {
 	
 	        comtnbbsRepository.save(AppUtils.bbsVOToEntity(boardVO));
 	        
+	        Calendar calendar = Calendar.getInstance();
+	        calendar.set(Calendar.MILLISECOND, 0);
+	        
 	        // COMTNBBSSYNCLOG에 Pending으로 저장
 	        Comtnbbssynclog syncLog = new Comtnbbssynclog();
 	        syncLog.setSyncId(idgenServiceSync.getNextStringId());
 	        syncLog.setNttId(boardVO.getNttId());
 	        syncLog.setBbsId(boardVO.getBbsId());
 	        syncLog.setSyncSttusCode("P");  // Pending
-	        syncLog.setRegistPnttm(new Date());
+	        syncLog.setRegistPnttm(calendar.getTime());
 	        syncLogRepository.save(syncLog);
         
         try {    
@@ -187,7 +200,7 @@ public class EgovArticleServiceImpl implements EgovArticleService {
                     .bbsId(boardVO.getBbsId())
                     .nttSj(boardVO.getNttSj())
                     .nttCn(boardVO.getNttCn())
-                    .eventDateTime(new Date())
+                    .eventDateTime(calendar.getTime())
                     .build();
             
             streamBridge.send("searchProducer-out-0", event);
@@ -244,13 +257,16 @@ public class EgovArticleServiceImpl implements EgovArticleService {
             parntsItem(bbs.getComtnbbsId().getBbsId(),bbs.getComtnbbsId().getNttId());
         }
         
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.MILLISECOND, 0);
+        
         // COMTNBBSSYNCLOG에 Pending으로 저장
         Comtnbbssynclog syncLog = new Comtnbbssynclog();
         syncLog.setSyncId(idgenServiceSync.getNextStringId());
         syncLog.setNttId(boardVO.getNttId());
         syncLog.setBbsId(boardVO.getBbsId());
         syncLog.setSyncSttusCode("P");  // Pending
-        syncLog.setRegistPnttm(new Date());
+        syncLog.setRegistPnttm(calendar.getTime());
         syncLogRepository.save(syncLog);
         
         try {
@@ -261,7 +277,7 @@ public class EgovArticleServiceImpl implements EgovArticleService {
         			.bbsId(boardVO.getBbsId())
         			.nttSj(boardVO.getNttSj())
         			.nttCn(boardVO.getNttCn())
-        			.eventDateTime(new Date())
+        			.eventDateTime(calendar.getTime())
         			.build();
         
         	streamBridge.send("searchProducer-out-0", event);
